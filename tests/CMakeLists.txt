@@ -1,4 +1,4 @@
-add_headers_and_sources(lpn_unit_tests ${CMAKE_CURRENT_SOURCE_DIR})
+add_sources(lpn_unit_tests ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(GTest REQUIRED)
 

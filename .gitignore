@@ -32,8 +32,6 @@
 *.app
 
 # Formating and IDE
-*.clang-tidy
-*.clang-format
 *.vscode
 
 # CMake
