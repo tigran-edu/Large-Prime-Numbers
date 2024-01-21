@@ -5,12 +5,27 @@
 
 namespace lpn
 {
-using boost::multiprecision::cpp_int;
+using long_int = boost::multiprecision::cpp_int;
 
-cpp_int gcd(cpp_int a, cpp_int b);
-cpp_int FastExponentiation(cpp_int a, cpp_int b);
-cpp_int FastExponentiationWithMod(cpp_int a, cpp_int b, cpp_int m);
-bool PseudoprimeTest(cpp_int p);
-std::unordered_map<cpp_int, size_t> BasicFactorization(cpp_int a);
+long_int FastExponentiation(long_int a, long_int b);
+long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m);
 
+size_t FullDiv(long_int & a, const long_int & b);
+
+template <typename T>
+T gcd(T a, T b)
+{
+    while (b != 0)
+        a = std::exchange(b, a % b);
+    return a;
+}
+
+template <size_t N>
+bool PseudoPrimeTest(const long_int & p, const std::array<long_int, N> & primes)
+{
+    for (auto & prime : primes)
+        if (lpn::gcd(p, prime) == 1 && FastExponentiationWithMod(prime, p - 1, p) != 1)
+            return false;
+    return true;
+}
 };

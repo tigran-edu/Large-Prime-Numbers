@@ -24,6 +24,7 @@ TabWidth: 4
 Standard: Cpp11
 PointerAlignment: Middle
 MaxEmptyLinesToKeep: 2
+SeparateDefinitionBlocks: Always
 KeepEmptyLinesAtTheStartOfBlocks: false
 AllowShortFunctionsOnASingleLine: InlineOnly
 AlwaysBreakTemplateDeclarations: true

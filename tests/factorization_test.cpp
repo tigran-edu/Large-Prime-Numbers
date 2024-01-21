@@ -14,9 +14,7 @@ TEST(Factorization, Basic)
     ASSERT_TRUE(factor.size() == 4);
     cpp_int result = 1;
     for (auto [div, amount] : factor)
-    {
-        result *= div;   
-    }
+        result *= div;
     ASSERT_TRUE(result == value2);
 }
 
@@ -25,15 +23,26 @@ TEST(Factorization, Rho)
     using boost::multiprecision::cpp_int;
 
     cpp_int value("5465458763478567834678638");
-    auto factor = lpn::RhoFactorization(value, 3, 10000000);
+    auto factor = lpn::RhoFactorization().factorize(value, 2);
 
     ASSERT_TRUE(factor.size() == 4);
 
     cpp_int result = 1;
     for (auto [div, amount] : factor)
-    {
-        result *= div;   
-    }
+        result *= div;
+
+    ASSERT_TRUE(result == value);
+
+    value <<= 20;
+    value += 1;
+    std::cout << value << '\n';
+    factor = lpn::RhoFactorization().factorize(value, 2);
+
+    ASSERT_TRUE(factor.size() == 2);
+
+    result = 1;
+    for (auto [div, amount] : factor)
+        result *= div;
 
     ASSERT_TRUE(result == value);
 

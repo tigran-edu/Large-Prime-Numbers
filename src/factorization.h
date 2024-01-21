@@ -5,9 +5,23 @@
 
 namespace lpn
 {
+using Factor = std::unordered_map<long_int, size_t>;
 
-using boost::multiprecision::cpp_int;
+struct RhoFactorization
+{
+    RhoFactorization();
+    RhoFactorization(const long_int & c, const size_t & max, const size_t & frequency);
+    Factor factorize(long_int n, long_int x1);
 
-std::unordered_map<cpp_int, size_t> RhoFactorization(cpp_int n, cpp_int c, cpp_int max);
+private:
+    void compute_diff(size_t & range, long_int & x1, long_int & x2);
+    long_int next(const long_int & x2, const long_int & n);
+    long_int compute_diff();
+    size_t check_gcd(long_int & n, const long_int & g);
+    long_int c;
+    size_t max;
+    size_t frequency;
+};
 
+Factor BasicFactorization(long_int a);
 };
