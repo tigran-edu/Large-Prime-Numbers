@@ -2,48 +2,57 @@
 #include "basic.h"
 #include "factorization.h"
 
-TEST(Factorization, Basic)
+namespace
 {
-    using boost::multiprecision::cpp_int;
-    cpp_int value1("4615021121");
-    auto factor = lpn::BasicFactorization(value1);
-    ASSERT_TRUE(factor.size() == 1 && factor[value1] == 1);
+using long_int = boost::multiprecision::cpp_int;
 
-    cpp_int value2("4615021122");
-    factor = lpn::BasicFactorization(value2);
-    ASSERT_TRUE(factor.size() == 4);
-    cpp_int result = 1;
-    for (auto [div, amount] : factor)
-        result *= div;
-    ASSERT_TRUE(result == value2);
+long_int eval(const lpn::Factor & factor)
+{
+    long_int result = 1;
+    for (const auto & [div, amount] : factor)
+        result *= lpn::FastExponentiation(div, amount);
+    return result;
 }
 
-TEST(Factorization, Rho)
+TEST(Factorization, BasicPrime)
 {
-    using boost::multiprecision::cpp_int;
+    long_int value("9111657031");
+    auto factor = lpn::BasicFactorization(value);
+    ASSERT_TRUE(factor.size() == 1 && factor[value] == 1);
+}
 
-    cpp_int value("5465458763478567834678638");
+TEST(Factorization, BasicComplex)
+{
+    long_int value("1307674368000");
+    auto factor = lpn::BasicFactorization(value);
+    ASSERT_TRUE(factor.size() == 6);
+    long_int result = 1;
+    for (const auto & [div, amount] : factor)
+        result *= lpn::FastExponentiation(div, amount);
+    ASSERT_TRUE(result == value);
+}
+
+TEST(Factorization, RhoBasic)
+{
+    long_int value("5465458763478567834678638");
     auto factor = lpn::RhoFactorization().factorize(value, 2);
 
     ASSERT_TRUE(factor.size() == 4);
-
-    cpp_int result = 1;
-    for (auto [div, amount] : factor)
-        result *= div;
-
-    ASSERT_TRUE(result == value);
-
-    value <<= 20;
-    value += 1;
-    std::cout << value << '\n';
-    factor = lpn::RhoFactorization().factorize(value, 2);
-
-    ASSERT_TRUE(factor.size() == 2);
-
-    result = 1;
-    for (auto [div, amount] : factor)
-        result *= div;
-
-    ASSERT_TRUE(result == value);
-
+    ASSERT_TRUE(eval(factor) == value);
 }
+
+TEST(Factorization, RhoLargeComplexValue)
+{
+    long_int value("71636382152868291931");
+
+    for (size_t i = 2; i <= 20; ++i)
+        value *= i;
+    // value now is 39 digit complex number
+    auto factor1 = lpn::RhoFactorization().factorize(value, 2);
+    auto factor2 = lpn::RhoFactorization().factorize(value, 5);
+
+    // starting point makes difference
+    ASSERT_TRUE(factor1.size() != factor2.size());
+    ASSERT_TRUE(eval(factor1) == eval(factor2));
+}
+};

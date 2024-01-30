@@ -10,3 +10,4 @@ macro(add_own_test test_name)
 endmacro()
 
 add_own_test(factorization_test)
+add_own_test(basic_test)
