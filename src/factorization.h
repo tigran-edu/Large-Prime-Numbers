@@ -14,12 +14,12 @@ struct RhoFactorization
     Factor factorize(long_int n, long_int x1);
 
 private:
-    void compute_diff(size_t & range, long_int & x1, long_int & x2);
+    long_int find_new_divisor(long_int & n, long_int & x1);
     long_int next(const long_int & x2, const long_int & n);
-    long_int compute_diff();
-    size_t check_gcd(long_int & n, const long_int & g);
+    void print_result(const Factor & factor);
+    void notify_user(const long_int & div);
     long_int c;
-    size_t max;
+    size_t max_iter_amount;
     size_t frequency;
 };
 

@@ -30,6 +30,8 @@ long_int FastExponentiation(long_int a, long_int b)
 
 size_t FullDiv(long_int & a, const long_int & b)
 {
+    if (b < 2)
+        return 0;
     size_t counter = 0;
     while (a % b == 0)
     {
