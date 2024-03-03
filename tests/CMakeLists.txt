@@ -9,5 +9,5 @@ macro(add_own_test test_name)
     target_include_directories(${test_name} PRIVATE "${PROJECT_SOURCE_DIR}/src")
 endmacro()
 
-add_own_test(factorization_test)
 add_own_test(basic_test)
+add_own_test(factorization_test)

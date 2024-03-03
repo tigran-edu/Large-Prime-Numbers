@@ -1,5 +1,7 @@
 #include "factorization.h"
+
 #include <iostream>
+
 #include "basic.h"
 
 enum
@@ -16,17 +18,23 @@ Factor BasicFactorization(long_int a)
 {
     Factor factor;
     if (auto counter = FullDiv(a, 2); counter > 0)
+    {
         factor[2] += counter;
+    }
 
     long_int div = 3;
     while (div * div <= a)
     {
         if (auto counter = FullDiv(a, div); counter > 0)
+        {
             factor[div] += counter;
+        }
         div += 2;
     }
     if (a > 1)
+    {
         factor[a]++;
+    }
     return factor;
 }
 
@@ -76,28 +84,31 @@ long_int RhoFactorization::find_new_divisor(long_int & n, long_int & x1)
             x2 = next(x2, n);
             product = (product * abs(x1 - x2)) % n;
             if (product == 0)
+            {
                 product = 1;
+            }
             terms++;
             if (terms % frequency == 0 || j + 1 == range)
             {
                 auto g = lpn::gcd(n, product);
                 if (g > 1)
+                {
                     return g;
+                }
             }
         }
         x1 = x2;
         range <<= 1;
         for (size_t j = 0; j < range; ++j)
+        {
             x2 = next(x2, n);
+        }
     }
     std::cerr << "No denominators were found. Please try again with different parameters.\n";
     return n;
 }
 
-long_int RhoFactorization::next(const long_int & x2, const long_int & n)
-{
-    return (x2 * x2 + c) % n;
-}
+long_int RhoFactorization::next(const long_int & x2, const long_int & n) { return (x2 * x2 + c) % n; }
 
 void RhoFactorization::print_result(const Factor & factor)
 {
@@ -109,9 +120,6 @@ void RhoFactorization::print_result(const Factor & factor)
     }
 }
 
-void RhoFactorization::notify_user(const long_int & div)
-{
-    std::cout << "New divisor had been founded " << div << '\n';
-}
+void RhoFactorization::notify_user(const long_int & div) { std::cout << "New divisor had been found " << div << '\n'; }
 
-};
+};  // namespace lpn

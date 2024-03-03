@@ -1,6 +1,8 @@
-#include <gtest/gtest.h>
-#include "basic.h"
 #include "factorization.h"
+
+#include <gtest/gtest.h>
+
+#include "basic.h"
 
 namespace
 {
@@ -10,7 +12,9 @@ long_int eval(const lpn::Factor & factor)
 {
     long_int result = 1;
     for (const auto & [div, amount] : factor)
+    {
         result *= lpn::FastExponentiation(div, amount);
+    }
     return result;
 }
 
@@ -28,7 +32,9 @@ TEST(Factorization, BasicComplex)
     ASSERT_TRUE(factor.size() == 6);
     long_int result = 1;
     for (const auto & [div, amount] : factor)
+    {
         result *= lpn::FastExponentiation(div, amount);
+    }
     ASSERT_TRUE(result == value);
 }
 
@@ -46,13 +52,15 @@ TEST(Factorization, RhoLargeComplexValue)
     long_int value("71636382152868291931");
 
     for (size_t i = 2; i <= 20; ++i)
+    {
         value *= i;
+    }
     // value now is 39 digit complex number
     auto factor1 = lpn::RhoFactorization().factorize(value, 2);
     auto factor2 = lpn::RhoFactorization().factorize(value, 5);
 
     // starting point makes difference
-    ASSERT_TRUE(factor1.size() != factor2.size());
+    ASSERT_TRUE(factor1 != factor2);
     ASSERT_TRUE(eval(factor1) == eval(factor2));
 }
-};
+};  // namespace

@@ -35,4 +35,4 @@ COPY ./ /project
 
 CMD cmake ../ && \
     make && \
-    CTEST_OUTPUT_ON_FAILURE=TRUE ctest tests
+    CTEST_OUTPUT_ON_FAILURE=TRUE ctest tests --verbose
