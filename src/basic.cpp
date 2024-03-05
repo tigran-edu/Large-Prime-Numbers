@@ -52,9 +52,19 @@ int LegendreSymbol::Compute(long_int n, long_int p)
 {
     int legendre = 1;
     n = n % p;
+
     if (n == 0)
     {
         return 0;
+    }
+
+    if (n < 0)
+    {
+        n *= -1;
+        if (p % 4 == 3)
+        {
+            legendre *= -1;
+        }
     }
 
     PullTwos(n, legendre, p);
@@ -65,7 +75,7 @@ int LegendreSymbol::Compute(long_int n, long_int p)
         {
             legendre *= -1;
         }
-        p = std::exchange(n, p % n);
+        p = std::exchange<long_int, long_int>(n, p % n);
         PullTwos(n, legendre, p);
     }
     return legendre;

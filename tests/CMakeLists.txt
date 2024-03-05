@@ -11,3 +11,4 @@ endmacro()
 
 add_own_test(basic_test)
 add_own_test(factorization_test)
+add_own_test(quadratic_sieve_test)

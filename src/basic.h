@@ -7,7 +7,7 @@
 
 namespace lpn
 {
-using long_int = boost::multiprecision::cpp_int;
+using long_int = boost::multiprecision::cpp_int;  // NOLINT
 
 long_int FastExponentiation(long_int a, long_int b);
 long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m);
@@ -15,11 +15,11 @@ long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m);
 size_t FullDiv(long_int & a, const long_int & b);
 
 template <typename T>
-T gcd(T a, T b)
+T gcd(T a, T b)  // NOLINT
 {
     while (b != 0)
     {
-        a = std::exchange(b, a % b);
+        a = std::exchange<T, T>(b, a % b);
     }
     return a;
 }

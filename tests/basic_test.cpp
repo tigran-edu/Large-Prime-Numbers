@@ -7,9 +7,9 @@
 namespace
 {
 
-using long_int = boost::multiprecision::cpp_int;
+using long_int = boost::multiprecision::cpp_int;  // NOLINT
 
-long_int basicPow(const long_int & a, long_int b)
+long_int BasicPow(const long_int & a, long_int b)
 {
     long_int answer = 1;
     while (b > 0)
@@ -20,7 +20,7 @@ long_int basicPow(const long_int & a, long_int b)
     return answer;
 }
 
-long_int basicPowWithMod(const long_int & a, const long_int & b, const long_int & mod) { return lpn::FastExponentiation(a, b) % mod; }
+long_int BasicPowWithMod(const long_int & a, const long_int & b, const long_int & mod) { return lpn::FastExponentiation(a, b) % mod; }
 
 TEST(Basic, fastExp)
 {
@@ -28,7 +28,7 @@ TEST(Basic, fastExp)
     {
         for (long_int a = 2; a < 100; ++a)
         {
-            ASSERT_EQ(lpn::FastExponentiation(a, b), basicPow(a, b));
+            ASSERT_EQ(lpn::FastExponentiation(a, b), BasicPow(a, b));
         }
     }
 }
@@ -41,7 +41,7 @@ TEST(Basic, fastExpWithMod)
 
     for (size_t i = 1; i <= 20; ++i)
     {
-        ASSERT_EQ(lpn::FastExponentiationWithMod(a, b, mod), basicPowWithMod(a, b, mod));
+        ASSERT_EQ(lpn::FastExponentiationWithMod(a, b, mod), BasicPowWithMod(a, b, mod));
         mod *= mod + 1;
         a += i;
         b += mod % i;

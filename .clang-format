@@ -29,7 +29,7 @@ BraceWrapping:
     BeforeLambdaBody: true
     IndentBraces: false
 
-SortIncludes: true
+SortIncludes: false
 IncludeCategories:
   - Regex: '^<[a-z_]+>'
     Priority: 1
