@@ -10,6 +10,10 @@ namespace lpn
 using long_int = boost::multiprecision::cpp_int;  // NOLINT
 using Factor = std::unordered_map<long_int, size_t>;
 
+void MergeFactors(Factor & first, const Factor & second);
+
+long_int Eval(const Factor & factor);
+
 long_int FastExponentiation(long_int a, long_int b);
 long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m);
 

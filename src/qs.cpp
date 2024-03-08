@@ -5,6 +5,56 @@
 namespace lpn
 {
 
+Factor QuadraticSieve::Factorize(long_int n)
+{
+    Factor factor;
+
+    SieveResult result = Sieve::Sieving(n);
+    GaussianBasic gs = GaussianBasic(result.factors, result.primes);
+    auto solutions = gs.Solve();
+
+    for (auto & sol : solutions)
+    {
+        if (sol.mask.none())
+        {
+            long_int check = CheckResults(result, sol, n);
+            if (check != 1 && check != n)
+            {
+                factor[check] = 1;
+                factor[n / check] = 1;
+                return factor;
+            }
+        }
+    }
+    return factor;
+}
+
+long_int QuadraticSieve::CheckResults(SieveResult & result, const GaussianBasic::Bitset & solution, const long_int & n)
+{
+    long_int x = 1;
+    Factor factor;
+    for (size_t i = 0; i < result.factors.size(); ++i)
+    {
+        if (solution.participants[i])
+        {
+            x = (x * (result.r + result.positions[i])) % n;
+            MergeFactors(factor, result.factors[i]);
+        }
+    }
+    long_int y = 1;
+    for (auto & [key, value] : factor)
+    {
+        assert(value % 2 == 0);
+        while (value > 0)
+        {
+            y = (y * key) % n;
+            value -= 2;
+        }
+    }
+    std::cout << x << " " << y << std::endl;
+    return lpn::gcd<long_int>(boost::multiprecision::abs(x - y), n);
+}
+
 long_int QuadraticCongruences::SolvingQuadraticCongruences(const long_int & n, const long_int & p)
 {
     if (p % 2 == 0)
@@ -82,12 +132,14 @@ std::vector<bool> QuadraticCongruences::Binary(long_int val)
     return std::move(bitset);
 }
 
-std::vector<long_int> Sieve::Sieving(long_int n)
+SieveResult Sieve::Sieving(long_int n)
 {
+    SieveResult result;
     Config cf(n);
-    std::vector<long_int> potential_divs;
     std::vector<cpp_bin_float_100> logs(2 * cf.m, 0);
     long_int r = boost::multiprecision::sqrt(n) - cf.m;
+    result.primes = cf.primes;
+    result.r = r;
 
     for (size_t pos = 0; pos < cf.primes.size(); ++pos)
     {
@@ -104,12 +156,18 @@ std::vector<long_int> Sieve::Sieving(long_int n)
 
     for (size_t i = 0; i < logs.size(); ++i)
     {
-        if (logs[i] > cf.closeness && IsDecomposed(cf, i, n))
+        if (logs[i] > cf.closeness)
         {
-            potential_divs.push_back(Eval(r, n, i));
+            auto factor = IsDecomposed(cf, i, n);
+            if (factor != std::nullopt)
+            {
+                std::cout << i << std::endl;
+                result.positions.push_back(i);
+                result.factors.push_back(std::move(factor.value()));
+            }
         }
     }
-    return potential_divs;
+    return result;
 }
 
 void Sieve::Fill(size_t i, size_t p, std::vector<cpp_bin_float_100> & logs)
@@ -122,15 +180,16 @@ void Sieve::Fill(size_t i, size_t p, std::vector<cpp_bin_float_100> & logs)
     }
 }
 
-bool Sieve::IsDecomposed(Config & cf, size_t i, const long_int & n)
+std::optional<Factor> Sieve::IsDecomposed(Config & cf, size_t i, const long_int & n)
 {
     long_int r = boost::multiprecision::sqrt(n) - cf.m;
     long_int value = Eval(r, n, i);
+    Factor factor;
     for (auto & p : cf.primes)
     {
-        FullDiv(value, p);
+        factor[p] += FullDiv(value, p);
     }
-    return value == 1;
+    return value == 1 ? std::optional<Factor>(factor) : std::nullopt;
 }
 
 long_int Sieve::Eval(const long_int & r, const long_int & n, size_t i)

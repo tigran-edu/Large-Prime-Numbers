@@ -1,18 +1,21 @@
 #pragma once
 
-#include <map>
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#include <optional>
 
 #include "basic.hpp"
+#include "gaussian.hpp"
 
 namespace lpn
 {
 using boost::multiprecision::cpp_bin_float_100;
 
-class QuadraticSieve
+struct SieveResult
 {
-   public:
-    static Factor Factorize(long_int n);
+    long_int r;
+    std::vector<size_t> primes;
+    std::vector<size_t> positions;
+    std::vector<Factor> factors;
 };
 
 class QuadraticCongruences
@@ -24,6 +27,13 @@ class QuadraticCongruences
     static long_int Solve(const long_int & n, const long_int & h, const long_int & p);
     static long_int FindStartValue(const long_int & n, const long_int & p);
     static std::vector<bool> Binary(long_int val);
+};
+
+class QuadraticSieve
+{
+   public:
+    static Factor Factorize(long_int n);
+    static long_int CheckResults(SieveResult & result, const GaussianBasic::Bitset & solution, const long_int & n);
 };
 
 struct Sieve
@@ -60,18 +70,18 @@ struct Sieve
 
         static size_t Size(const long_int & n) { return n.str().size(); }
 
-        cpp_bin_float_100 t{1.5};
-        size_t m{5'000};
-        size_t factor_size{28};
+        cpp_bin_float_100 t{2};
+        size_t m{50'000'000};
+        size_t factor_size{2000};
         cpp_bin_float_100 target;
         cpp_bin_float_100 closeness;
         std::vector<size_t> primes;
         std::vector<long_int> congruences;
     };
 
-    static std::vector<long_int> Sieving(long_int n);
+    static SieveResult Sieving(long_int n);
     static void Fill(size_t i, size_t p, std::vector<cpp_bin_float_100> & logs);
-    static bool IsDecomposed(Config & cf, size_t i, const long_int & n);
+    static std::optional<Factor> IsDecomposed(Config & cf, size_t i, const long_int & n);
     static long_int Eval(const long_int & r, const long_int & n, size_t i);
 };
 

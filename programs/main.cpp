@@ -4,5 +4,10 @@
 int main()
 {
     using namespace lpn;  // NOLINT
-    Sieve::Sieving(4999486012441);
+    long_int n("59469489332848408438249254427481121839977");
+    Factor factor = QuadraticSieve::Factorize(n);
+    for (auto & [key, value] : factor)
+    {
+        std::cout << value << " " << key << std::endl;
+    }
 }

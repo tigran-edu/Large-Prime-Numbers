@@ -3,6 +3,24 @@
 namespace lpn
 {
 
+void MergeFactors(Factor & first, const Factor & second)
+{
+    for (auto & [key, value] : second)
+    {
+        first[key] += value;
+    }
+}
+
+long_int Eval(const Factor & factor)
+{
+    long_int result = 1;
+    for (const auto & [div, amount] : factor)
+    {
+        result *= FastExponentiation(div, amount);
+    }
+    return result;
+}
+
 long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m)
 {
     long_int n = 1;

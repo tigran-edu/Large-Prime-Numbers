@@ -6,16 +6,6 @@ namespace
 {
 using namespace lpn;  // NOLINT
 
-long_int Eval(const Factor & factor)
-{
-    long_int result = 1;
-    for (const auto & [div, amount] : factor)
-    {
-        result *= FastExponentiation(div, amount);
-    }
-    return result;
-}
-
 TEST(Factorization, RhoBasic)
 {
     long_int value("5465458763478567834678638");
