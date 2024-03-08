@@ -10,5 +10,5 @@ macro(add_own_test test_name)
 endmacro()
 
 add_own_test(basic_test)
-add_own_test(factorization_test)
-add_own_test(quadratic_sieve_test)
+add_own_test(rho_factor_test)
+add_own_test(qs_factor_test)

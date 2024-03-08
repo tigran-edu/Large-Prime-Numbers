@@ -1,4 +1,4 @@
-#include "basic.h"
+#include "basic.hpp"
 
 namespace lpn
 {
@@ -93,6 +93,53 @@ void LegendreSymbol::PullTwos(long_int & n, int & legendre, const long_int & p)
     {
         legendre *= -1;
     }
+}
+
+Factor BasicFactorization(long_int a)
+{
+    Factor factor;
+    if (auto counter = FullDiv(a, 2); counter > 0)
+    {
+        factor[2] += counter;
+    }
+
+    long_int div = 3;
+    while (div * div <= a)
+    {
+        if (auto counter = FullDiv(a, div); counter > 0)
+        {
+            factor[div] += counter;
+        }
+        div += 2;
+    }
+    if (a > 1)
+    {
+        factor[a]++;
+    }
+    return factor;
+}
+
+bool BasicIsPrime(const long_int & a)
+{
+    if (a <= 3)
+    {
+        return true;
+    }
+    if (a % 2 == 0)
+    {
+        return false;
+    }
+    long_int div = 3;
+    while (div * div <= a)
+    {
+        if (a % div == 0)
+        {
+            return false;
+        }
+        div++;
+    }
+
+    return true;
 }
 
 };  // namespace lpn

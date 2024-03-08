@@ -3,11 +3,10 @@
 #include <map>
 #include <vector>
 
-#include "basic.h"
+#include "basic.hpp"
 
 namespace lpn
 {
-using Factor = std::unordered_map<long_int, size_t>;
 
 class RhoFactorization
 {
@@ -26,22 +25,4 @@ class RhoFactorization
     size_t frequency_;
 };
 
-class QuadraticSieve
-{
-   public:
-    static Factor Factorize(long_int n);
-};
-
-class QuadraticCongruences
-{
-   public:
-    static long_int SolvingQuadraticCongruences(const long_int & n, const long_int & p);
-
-   private:
-    static long_int Solve(const long_int & n, const long_int & h, const long_int & p);
-    static long_int FindStartValue(const long_int & n, const long_int & p);
-    static std::vector<bool> Binary(long_int val);
-};
-
-Factor BasicFactorization(long_int a);
 };  // namespace lpn

@@ -8,6 +8,7 @@
 namespace lpn
 {
 using long_int = boost::multiprecision::cpp_int;  // NOLINT
+using Factor = std::unordered_map<long_int, size_t>;
 
 long_int FastExponentiation(long_int a, long_int b);
 long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m);
@@ -78,5 +79,9 @@ class LegendreSymbol
    private:
     static void PullTwos(long_int & n, int & legendre, const long_int & p);
 };
+
+Factor BasicFactorization(long_int a);
+
+bool BasicIsPrime(const long_int & a);
 
 };  // namespace lpn

@@ -1,4 +1,4 @@
-#include "factorization.h"
+#include "qs.hpp"
 #include "boost/random.hpp"
 
 #include <gtest/gtest.h>

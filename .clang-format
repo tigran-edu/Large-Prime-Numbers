@@ -1,7 +1,7 @@
 BasedOnStyle: Google
 Language: Cpp
 Standard: Cpp11
-ColumnLimit: 140
+ColumnLimit: 120
 
 TabWidth: 4
 UseTab: Never

@@ -1,12 +1,10 @@
-#include "factorization.h"
+#include "rho_factorization.hpp"
 
 #include <gtest/gtest.h>
-#include "basic.h"
 
 namespace
 {
-using long_int = boost::multiprecision::cpp_int;  // NOLINT
-using namespace lpn;                              // NOLINT
+using namespace lpn;  // NOLINT
 
 long_int Eval(const Factor & factor)
 {
@@ -16,26 +14,6 @@ long_int Eval(const Factor & factor)
         result *= FastExponentiation(div, amount);
     }
     return result;
-}
-
-TEST(Factorization, BasicPrime)
-{
-    long_int value("9111657031");
-    auto factor = BasicFactorization(value);
-    ASSERT_TRUE(factor.size() == 1 && factor[value] == 1);
-}
-
-TEST(Factorization, BasicComplex)
-{
-    long_int value("1307674368000");
-    auto factor = BasicFactorization(value);
-    ASSERT_TRUE(factor.size() == 6);
-    long_int result = 1;
-    for (const auto & [div, amount] : factor)
-    {
-        result *= FastExponentiation(div, amount);
-    }
-    ASSERT_TRUE(result == value);
 }
 
 TEST(Factorization, RhoBasic)
