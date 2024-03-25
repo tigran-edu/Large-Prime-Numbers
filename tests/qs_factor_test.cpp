@@ -49,7 +49,7 @@ TEST(Sieve, QuadraticCongruencesRandom)
 
 TEST(Sieve, QuadraticCongruencesHeavy)
 {
-    std::ifstream file("primes.txt");
+    std::ifstream file("primes.txt", std::ios_base::in);
     long_int p;
     boost::mt19937 rng(42);
     while (file >> p)
@@ -61,5 +61,24 @@ TEST(Sieve, QuadraticCongruencesHeavy)
         }
     }
 }
+
+// TEST(Sieve, QuadraticSieve)
+// {
+//     const std::array<long_int, 4> primes = {391708601274539, 136564985324737, 261009627419033, 630274293935959};
+//     for (const long_int & p1 : primes)
+//     {
+//         for (const long_int & p2 : primes)
+//         {
+//             long_int value = p1 * p2;
+//             Factor factor = QuadraticSieve::Factorize(value);
+//             for (auto & [key, value] : factor)
+//             {
+//                 std::cout << key << " " << value << std::endl;
+//             }
+//             std::cout << factor[p1] << " " << factor[p2] << std::endl;
+//             ASSERT_TRUE(factor[p1] == 1 && factor[p2] == 1 && factor.size() == 2);
+//         }
+//     }
+// }
 
 };  // namespace

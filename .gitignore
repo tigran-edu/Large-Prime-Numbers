@@ -37,3 +37,6 @@
 # CMake
 build
 .cache
+
+# macOS files
+.DS_Store

@@ -20,7 +20,10 @@ long_int BasicPow(const long_int & a, long_int b)
     return answer;
 }
 
-long_int BasicPowWithMod(const long_int & a, const long_int & b, const long_int & mod) { return FastExponentiation(a, b) % mod; }
+long_int BasicPowWithMod(const long_int & a, const long_int & b, const long_int & mod)
+{
+    return FastExponentiation(a, b) % mod;
+}
 
 TEST(Basic, fastExp)
 {
@@ -50,9 +53,28 @@ TEST(Basic, fastExpWithMod)
 
 TEST(Basic, fullDiv)
 {
-    long_int a = FastExponentiation(2, 10);
-    ASSERT_EQ(FullDiv(a, 2), 10);
-    ASSERT_EQ(a, 1);
+    for (size_t i = 2; i < 5; ++i)
+    {
+        for (size_t j = 10; j < 32; ++j)
+        {
+            long_int a = FastExponentiation(i, j);
+            ASSERT_EQ(FullDiv(a, i), j);
+            ASSERT_EQ(a, 1);
+        }
+    }
+}
+
+TEST(Basic, fullDivFast)
+{
+    for (size_t i = 2; i < 5; ++i)
+    {
+        for (size_t j = 10; j < 32; ++j)
+        {
+            long_int a = FastExponentiation(i, j);
+            ASSERT_EQ(FullDivFast(a, i), j);
+            ASSERT_EQ(a, 1);
+        }
+    }
 }
 
 TEST(Basic, IsPrime)

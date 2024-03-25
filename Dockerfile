@@ -29,10 +29,11 @@ RUN cd /tmp && \
     ./b2 install && \
     rm -rf /tmp/*
 
-WORKDIR /project/build
+WORKDIR /project
 
-COPY ./ /project
+COPY ./ ./
 
-CMD cmake ../ && \
+CMD cmake . && \
+    cmake --build ./ --config Release && \
     make && \
     CTEST_OUTPUT_ON_FAILURE=TRUE ctest tests --verbose

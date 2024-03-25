@@ -66,6 +66,22 @@ size_t FullDiv(long_int & a, const long_int & b)
     return counter;
 }
 
+size_t FullDivFast(long_int & a, const long_int & b, size_t i)
+{
+    if (b < 2 || a % b != 0)
+    {
+        return 0;
+    }
+
+    size_t counter = FullDivFast(a, b * b, 2 * i);
+    if (a % b == 0)
+    {
+        counter += i;
+        a /= b;
+    }
+    return counter;
+}
+
 int LegendreSymbol::Compute(long_int n, long_int p)
 {
     int legendre = 1;

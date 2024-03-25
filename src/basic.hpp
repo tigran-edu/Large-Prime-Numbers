@@ -18,6 +18,7 @@ long_int FastExponentiation(long_int a, long_int b);
 long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m);
 
 size_t FullDiv(long_int & a, const long_int & b);
+size_t FullDivFast(long_int & a, const long_int & b, size_t i = 1);
 
 template <typename T>
 T gcd(T a, T b)  // NOLINT

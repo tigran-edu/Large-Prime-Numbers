@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include <boost/dynamic_bitset.hpp>
 #include "basic.hpp"
@@ -21,59 +23,13 @@ class GaussianBasic
         boost::dynamic_bitset<> mask;
     };
 
-    GaussianBasic(const std::vector<Factor> & factors, const std::vector<size_t> & primes)
-        : n_(factors.size()), m_(primes.size()), factors_(factors)
+    GaussianBasic(const std::vector<Factor> & factors, const std::vector<size_t> & primes);
 
-    {
-        for (size_t i = 0; i < n_; ++i)
-        {
-            matrix_.push_back(Bitset(n_, m_));
-            for (size_t j = 0; j < m_; ++j)
-            {
-                matrix_[i].mask[j] = (factors_[i][primes[j]]) % 2 == 1;
-            }
-            matrix_[i].participants[i] = true;
-        }
-    }
+    std::vector<Bitset> Solve();
 
-    std::vector<Bitset> Solve()
-    {
-        for (size_t i = 0; i < n_; ++i)
-        {
-            size_t pos = 0;
-            for (size_t j = 0; j < m_; ++j)
-            {
-                if (matrix_[i].mask[j])
-                {
-                    pos = j;
-                    break;
-                }
-            }
-            Add(pos, i);
-        }
-        // Print();
-        return matrix_;
-    }
+    void Add(size_t pos, size_t line);
 
-    void Add(size_t pos, size_t line)
-    {
-        for (size_t i = 0; i < n_; ++i)
-        {
-            if (line != i && matrix_[i].mask[pos])
-            {
-                matrix_[i] ^= matrix_[line];
-            }
-        }
-    }
-
-    void Print()
-    {
-        for (size_t i = 0; i < n_; ++i)
-        {
-            std::cout << matrix_[i].mask << " " << matrix_[i].participants << '\n';
-        }
-        std::cout << std::endl;
-    }
+    void Print();
 
    private:
     size_t m_;

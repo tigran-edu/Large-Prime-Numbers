@@ -8,7 +8,6 @@ namespace lpn
 Factor QuadraticSieve::Factorize(long_int n)
 {
     Factor factor;
-
     SieveResult result = Sieve::Sieving(n);
     GaussianBasic gs = GaussianBasic(result.factors, result.primes);
     auto solutions = gs.Solve();
@@ -51,7 +50,6 @@ long_int QuadraticSieve::CheckResults(SieveResult & result, const GaussianBasic:
             value -= 2;
         }
     }
-    std::cout << x << " " << y << std::endl;
     return lpn::gcd<long_int>(boost::multiprecision::abs(x - y), n);
 }
 
@@ -136,7 +134,7 @@ SieveResult Sieve::Sieving(long_int n)
 {
     SieveResult result;
     Config cf(n);
-    std::vector<cpp_bin_float_100> logs(2 * cf.m, 0);
+    std::vector<float> logs(2 * cf.m, 0.0);
     long_int r = boost::multiprecision::sqrt(n) - cf.m;
     result.primes = cf.primes;
     result.r = r;
@@ -146,22 +144,17 @@ SieveResult Sieve::Sieving(long_int n)
         size_t p = cf.primes[pos];
         // n = x^2 mod p; f(r) = r^2 - n; target f(r) == 0 mod p
         size_t i = (size_t)((cf.congruences[pos] + p - (r % p)) % p);
-        Fill(i, p, logs);
         size_t j = (size_t)((2 * p - cf.congruences[pos] - (r % p)) % p);
-        if (j != i)
-        {
-            Fill(i, p, logs);
-        }
+        CacheSaveFill(i, j, p, logs);
     }
 
     for (size_t i = 0; i < logs.size(); ++i)
     {
-        if (logs[i] > cf.closeness)
+        if (cf.closeness <= logs[i] && logs[i] <= cf.target && result.positions.size() < 1.15 * cf.factor_size)
         {
             auto factor = IsDecomposed(cf, i, n);
             if (factor != std::nullopt)
             {
-                std::cout << i << std::endl;
                 result.positions.push_back(i);
                 result.factors.push_back(std::move(factor.value()));
             }
@@ -170,9 +163,9 @@ SieveResult Sieve::Sieving(long_int n)
     return result;
 }
 
-void Sieve::Fill(size_t i, size_t p, std::vector<cpp_bin_float_100> & logs)
+void Sieve::Fill(size_t i, size_t p, std::vector<float> & logs)
 {
-    cpp_bin_float_100 p_log = log10(cpp_bin_float_100(p));
+    float p_log = log10(float(p));
     while (i < logs.size())
     {
         logs[i] += p_log;
@@ -180,19 +173,48 @@ void Sieve::Fill(size_t i, size_t p, std::vector<cpp_bin_float_100> & logs)
     }
 }
 
+void Sieve::CacheSaveFill(size_t i, size_t j, size_t p, std::vector<float> & logs)
+{
+    if (j < i)
+    {
+        std::swap(i, j);
+    }
+    else if (i == j)
+    {
+        Fill(i, p, logs);
+        return;
+    }
+
+    float p_log = log10(float(p));
+    while (j < logs.size())
+    {
+        logs[i] += p_log;
+        logs[j] += p_log;
+        i += p;
+        j += p;
+    }
+    if (i < logs.size())
+    {
+        logs[i] += p_log;
+    }
+}
+
 std::optional<Factor> Sieve::IsDecomposed(Config & cf, size_t i, const long_int & n)
 {
     long_int r = boost::multiprecision::sqrt(n) - cf.m;
-    long_int value = Eval(r, n, i);
+    long_int value = F(r, n, i);
     Factor factor;
-    for (auto & p : cf.primes)
+    for (auto p : cf.primes)
     {
-        factor[p] += FullDiv(value, p);
+        if (value % p == 0)
+        {
+            factor[p] += FullDivFast(value, p);
+        }
     }
     return value == 1 ? std::optional<Factor>(factor) : std::nullopt;
 }
 
-long_int Sieve::Eval(const long_int & r, const long_int & n, size_t i)
+long_int Sieve::F(const long_int & r, const long_int & n, size_t i)
 {
     return boost::multiprecision::abs((r + i) * (r + i) - n);
 }
