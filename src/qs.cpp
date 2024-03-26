@@ -5,7 +5,7 @@
 namespace lpn
 {
 
-Factor QuadraticSieve::Factorize(long_int n)
+Factor QuadraticSieve::Factorize(const long_int & n)
 {
     Factor factor;
     SieveResult result = Sieve::Sieving(n);
@@ -130,7 +130,7 @@ std::vector<bool> QuadraticCongruences::Binary(long_int val)
     return std::move(bitset);
 }
 
-SieveResult Sieve::Sieving(long_int n)
+SieveResult Sieve::Sieving(const long_int & n)
 {
     SieveResult result;
     Config cf(n);

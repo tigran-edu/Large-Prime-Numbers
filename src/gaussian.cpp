@@ -15,7 +15,7 @@ GaussianBasic::GaussianBasic(const std::vector<Factor> & factors, const std::vec
             auto iter = factors_[i].find(primes[j]);
             if (iter != factors_[i].end())
             {
-                matrix_[i].mask[j] = iter->second % 2 == 1;
+                matrix_[i].mask[j] = bool(iter->second % 2);
             }
         }
         matrix_[i].participants[i] = true;
