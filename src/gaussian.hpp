@@ -9,32 +9,38 @@ namespace lpn
 class GaussianBasic
 {
    public:
-    struct Bitset
+    class Line
     {
-        Bitset(size_t n, size_t m) : participants(n), mask(m) {}
+       public:
+        Line(size_t n, size_t m) : participants(n), mask(m) {}
 
-        void operator^=(Bitset & bitset)
+        Line & operator^=(Line & line)
         {
-            mask ^= bitset.mask;
-            participants ^= bitset.participants;
+            mask ^= line.mask;
+            participants ^= line.participants;
+            return *this;
         }
 
         boost::dynamic_bitset<> participants;
         boost::dynamic_bitset<> mask;
     };
 
-    GaussianBasic(const std::vector<FactorSet> & factors, const std::vector<size_t> & primes);
+    using Matrix = std::vector<Line>;
 
-    std::vector<Bitset> Solve();
+    static Matrix CreateMatrix(const FactorSets & factors, const std::vector<size_t> & primes);
 
-    void Add(size_t pos, size_t line);
+    GaussianBasic(const FactorSets & factors, const std::vector<size_t> & primes);
 
-    void Print();
+    Matrix Solve();
+
+    size_t FindFirstNonZeroInLine(size_t line_pos);
+
+    void Add(size_t col, size_t line);
 
    private:
     size_t m_;
     size_t n_;
-    std::vector<FactorSet> factors_;
-    std::vector<Bitset> matrix_;
+    Matrix matrix_;
+    const FactorSets & factors_;
 };
 };  // namespace lpn

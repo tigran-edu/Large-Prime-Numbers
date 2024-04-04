@@ -15,7 +15,7 @@ struct SieveResult
     long_int r;
     std::vector<size_t> primes;
     std::vector<size_t> positions;
-    std::vector<FactorSet> factors;
+    FactorSets factors;
 };
 
 class QuadraticCongruences
@@ -33,7 +33,7 @@ class QuadraticSieve
 {
    public:
     static FactorSet Factorize(const long_int & n);
-    static long_int CheckResults(SieveResult & result, const GaussianBasic::Bitset & solution, const long_int & n);
+    static long_int CheckResults(SieveResult & result, const GaussianBasic::Line & solution, const long_int & n);
 };
 
 struct Sieve

@@ -2,62 +2,70 @@
 
 namespace lpn
 {
+using Line = GaussianBasic::Line;
+using Matrix = GaussianBasic::Matrix;
 
-GaussianBasic::GaussianBasic(const std::vector<FactorSet> & factors, const std::vector<size_t> & primes)
-    : n_(factors.size()), m_(primes.size()), factors_(factors)
-
+GaussianBasic::GaussianBasic(const FactorSets & factors, const std::vector<size_t> & primes)
+    : n_(factors.size()), m_(primes.size()), matrix_(CreateMatrix(factors, primes)), factors_(factors)
 {
-    for (size_t i = 0; i < n_; ++i)
-    {
-        matrix_.push_back(Bitset(n_, m_));
-        for (size_t j = 0; j < m_; ++j)
-        {
-            auto iter = factors_[i].find(primes[j]);
-            if (iter != factors_[i].end())
-            {
-                matrix_[i].mask[j] = bool(iter->second % 2);
-            }
-        }
-        matrix_[i].participants[i] = true;
-    }
 }
 
-std::vector<GaussianBasic::Bitset> GaussianBasic::Solve()
+Matrix GaussianBasic::CreateMatrix(const FactorSets & factors, const std::vector<size_t> & primes)
+{
+    size_t n = factors.size();
+    size_t m = primes.size();
+
+    Matrix matrix;
+    for (size_t i = 0; i < n; ++i)
+    {
+        matrix.push_back(Line(n, m));
+        for (size_t j = 0; j < m; ++j)
+        {
+            auto iter = factors[i].find(primes[j]);
+            if (iter != factors[i].end())
+            {
+                matrix[i].mask[j] = bool(iter->second % 2);
+            }
+        }
+        matrix[i].participants[i] = true;
+    }
+    return matrix;
+}
+
+size_t GaussianBasic::FindFirstNonZeroInLine(size_t line_pos)
+{
+    for (size_t col = 0; col < m_; ++col)
+    {
+        if (matrix_[line_pos].mask[col])
+        {
+            return col;
+        }
+    }
+    return m_;
+}
+
+std::vector<Line> GaussianBasic::Solve()
 {
     for (size_t i = 0; i < n_; ++i)
     {
-        size_t pos = 0;
-        for (size_t j = 0; j < m_; ++j)
+        size_t col = FindFirstNonZeroInLine(i);
+        if (col != m_)
         {
-            if (matrix_[i].mask[j])
-            {
-                pos = j;
-                break;
-            }
+            Add(col, i);
         }
-        Add(pos, i);
     }
     return matrix_;
 }
 
-void GaussianBasic::Add(size_t pos, size_t line)
+void GaussianBasic::Add(size_t col, size_t line)
 {
     for (size_t i = 0; i < n_; ++i)
     {
-        if (line != i && matrix_[i].mask[pos])
+        if (line != i && matrix_[i].mask[col])
         {
             matrix_[i] ^= matrix_[line];
         }
     }
-}
-
-void GaussianBasic::Print()
-{
-    for (size_t i = 0; i < n_; ++i)
-    {
-        std::cout << matrix_[i].mask << " " << matrix_[i].participants << '\n';
-    }
-    std::cout << std::endl;
 }
 
 };  // namespace lpn

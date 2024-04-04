@@ -29,7 +29,7 @@ FactorSet QuadraticSieve::Factorize(const long_int & n)
     return factor;
 }
 
-long_int QuadraticSieve::CheckResults(SieveResult & result, const GaussianBasic::Bitset & solution, const long_int & n)
+long_int QuadraticSieve::CheckResults(SieveResult & result, const GaussianBasic::Line & solution, const long_int & n)
 {
     long_int x = 1;
     FactorSet factor;
@@ -56,13 +56,7 @@ long_int QuadraticSieve::CheckResults(SieveResult & result, const GaussianBasic:
 
 long_int QuadraticCongruences::SolvingQuadraticCongruences(const long_int & n, const long_int & p)
 {
-    if (p % 2 == 0)
-    {
-        throw std::runtime_error(
-            "SolvingQuadraticCongruences available only for odd prime numbers. "
-            "Entered value: " +
-            p.str());
-    }
+    assert(p % 2 != 0);
 
     if (p % 4 == 3)
     {
