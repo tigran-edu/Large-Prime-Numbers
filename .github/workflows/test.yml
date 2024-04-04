@@ -10,6 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: docker build
-        run: docker build -t tests .
+        run: docker build --tag=tests -f tests/Dockerfile .
       - name: run docker
         run: docker run -t --rm tests

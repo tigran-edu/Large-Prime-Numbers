@@ -23,7 +23,7 @@ class GaussianBasic
         boost::dynamic_bitset<> mask;
     };
 
-    GaussianBasic(const std::vector<Factor> & factors, const std::vector<size_t> & primes);
+    GaussianBasic(const std::vector<FactorSet> & factors, const std::vector<size_t> & primes);
 
     std::vector<Bitset> Solve();
 
@@ -34,7 +34,7 @@ class GaussianBasic
    private:
     size_t m_;
     size_t n_;
-    std::vector<Factor> factors_;
+    std::vector<FactorSet> factors_;
     std::vector<Bitset> matrix_;
 };
 };  // namespace lpn

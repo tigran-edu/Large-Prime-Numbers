@@ -1,17 +1,18 @@
 #include "basic.hpp"
+#include <cassert>
 
 namespace lpn
 {
 
-void MergeFactors(Factor & first, const Factor & second)
+void MergeFactorSets(FactorSet & first, const FactorSet & second)
 {
-    for (auto & [key, value] : second)
+    for (const auto & [key, value] : second)
     {
         first[key] += value;
     }
 }
 
-long_int Eval(const Factor & factor)
+long_int Eval(const FactorSet & factor)
 {
     long_int result = 1;
     for (const auto & [div, amount] : factor)
@@ -23,6 +24,8 @@ long_int Eval(const Factor & factor)
 
 long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m)
 {
+    assert(b > 0);
+
     long_int n = 1;
     while (b != 0)
     {
@@ -38,6 +41,8 @@ long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m)
 
 long_int FastExponentiation(long_int a, long_int b)
 {
+    assert(b > 0);
+
     long_int n = 1;
     while (b != 0)
     {
@@ -51,38 +56,38 @@ long_int FastExponentiation(long_int a, long_int b)
     return n;
 }
 
-size_t FullDiv(long_int & a, const long_int & b)
+size_t ExtractPower(long_int & a, const long_int & b)
 {
-    if (b < 2)
-    {
-        return 0;
-    }
-    size_t counter = 0;
+    assert(b > 1);
+
+    size_t power = 0;
     while (a % b == 0)
     {
         a /= b;
-        counter++;
+        power++;
     }
-    return counter;
+    return power;
 }
 
-size_t FullDivFast(long_int & a, const long_int & b, size_t i)
+size_t ExtractPowerFast(long_int & a, const long_int & b)
 {
-    if (b < 2 || a % b != 0)
+    assert(b > 1);
+
+    if (a % b != 0)
     {
         return 0;
     }
 
-    size_t counter = FullDivFast(a, b * b, 2 * i);
+    size_t power = ExtractPowerFast(a, b * b) * 2;
     if (a % b == 0)
     {
-        counter += i;
+        power += 1;
         a /= b;
     }
-    return counter;
+    return power;
 }
 
-int LegendreSymbol::Compute(long_int n, long_int p)
+int ComputeLegendreSymbol(long_int n, long_int p)
 {
     int legendre = 1;
     n = n % p;
@@ -101,46 +106,35 @@ int LegendreSymbol::Compute(long_int n, long_int p)
         }
     }
 
-    PullTwos(n, legendre, p);
-
     while (n > 1)
     {
+        size_t deg = ExtractPower(n, 2);
+        if (deg % 2 == 1 && (p * p - 1) % 16 == 8)
+        {
+            legendre *= -1;
+        }
         if ((n - 1) * (p - 1) % 8 == 4)
         {
             legendre *= -1;
         }
         p = std::exchange<long_int, long_int>(n, p % n);
-        PullTwos(n, legendre, p);
     }
     return legendre;
 }
 
-void LegendreSymbol::PullTwos(long_int & n, int & legendre, const long_int & p)
+FactorSet FactorizeBasic(long_int a)
 {
-    int count = 0;
-    while (n % 2 == 0)
-    {
-        n /= 2;
-        count = 1 - count;
-    }
-    if ((p * p - 1) * count % 16 == 8)
-    {
-        legendre *= -1;
-    }
-}
-
-Factor BasicFactorization(long_int a)
-{
-    Factor factor;
-    if (auto counter = FullDiv(a, 2); counter > 0)
+    FactorSet factor;
+    if (auto counter = ExtractPowerFast(a, 2); counter > 0)
     {
         factor[2] += counter;
     }
 
     long_int div = 3;
-    while (div * div <= a)
+    long_int sqrt_a = boost::multiprecision::sqrt(a);
+    while (div <= sqrt_a)
     {
-        if (auto counter = FullDiv(a, div); counter > 0)
+        if (auto counter = ExtractPowerFast(a, div); counter > 0)
         {
             factor[div] += counter;
         }
@@ -153,7 +147,7 @@ Factor BasicFactorization(long_int a)
     return factor;
 }
 
-bool BasicIsPrime(const long_int & a)
+bool IsPrimeBasic(const long_int & a)
 {
     if (a <= 3)
     {
@@ -164,16 +158,28 @@ bool BasicIsPrime(const long_int & a)
         return false;
     }
     long_int div = 3;
-    while (div * div <= a)
+    long_int sqrt_a = boost::multiprecision::sqrt(a);
+    while (div <= sqrt_a)
     {
         if (a % div == 0)
         {
             return false;
         }
-        div++;
+        div += 2;
     }
 
     return true;
+}
+
+long_int PowBasic(const long_int & a, long_int b)
+{
+    long_int answer = 1;
+    while (b > 0)
+    {
+        answer *= a;
+        --b;
+    }
+    return answer;
 }
 
 };  // namespace lpn

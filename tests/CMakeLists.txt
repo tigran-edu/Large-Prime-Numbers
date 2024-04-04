@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.22)
+
 add_sources(lpn_unit_tests ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(GTest REQUIRED)

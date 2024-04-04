@@ -27,15 +27,15 @@ RhoFactorization::RhoFactorization(const long_int & c, const size_t & max, const
 {
 }
 
-Factor RhoFactorization::Factorize(long_int n, long_int x1)
+FactorSet RhoFactorization::Factorize(long_int n, long_int x1)
 {
     std::cout << "Start to factorize number " << n << '\n';
-    Factor factor;
+    FactorSet factor;
 
     for (size_t i = 0; i < MAX_ATTEMP && n > 1; ++i)
     {
         auto divisor = FindNewDivisor(n, x1);
-        factor[divisor] += FullDiv(n, divisor);
+        factor[divisor] += ExtractPowerFast(n, divisor);
         NotifyUser(divisor);
     }
     PrintResult(factor);
@@ -45,15 +45,15 @@ Factor RhoFactorization::Factorize(long_int n, long_int x1)
 long_int RhoFactorization::FindNewDivisor(long_int & n, long_int & x1)
 {
     const std::array<long_int, 7> primes = {2, 3, 5, 7, 11, 13, 61631};
-    if (PseudoPrimeTest(n, primes))
+    if (IsPseudoPrime(n, primes))
     {
-        std::cerr << "Warning: Value " << n << " is Pseudoprime\n";
+        std::cout << "Warning: Value " << n << " is Pseudoprime\n";
         return n;
     }
     long_int x2 = Next(x1, n);
     size_t range = 1;
     size_t terms = 0;
-    while (terms <= max_iter_amount_ && !PseudoPrimeTest(n, primes))
+    while (terms <= max_iter_amount_ && !IsPseudoPrime(n, primes))
     {
         long_int product = 1;
         for (size_t j = 0; j < range; ++j)
@@ -87,7 +87,7 @@ long_int RhoFactorization::FindNewDivisor(long_int & n, long_int & x1)
 
 long_int RhoFactorization::Next(const long_int & x2, const long_int & n) { return (x2 * x2 + c_) % n; }
 
-void RhoFactorization::PrintResult(const Factor & factor)
+void RhoFactorization::PrintResult(const FactorSet & factor)
 {
     std::cout << "RESULT:\n";
     for (const auto & [div, deg] : factor)

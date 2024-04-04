@@ -1,13 +1,14 @@
 #include "qs.hpp"
 #include <boost/random.hpp>
+#include "basic.hpp"
 #include <stdexcept>
 
 namespace lpn
 {
 
-Factor QuadraticSieve::Factorize(const long_int & n)
+FactorSet QuadraticSieve::Factorize(const long_int & n)
 {
-    Factor factor;
+    FactorSet factor;
     SieveResult result = Sieve::Sieving(n);
     GaussianBasic gs = GaussianBasic(result.factors, result.primes);
     auto solutions = gs.Solve();
@@ -31,13 +32,13 @@ Factor QuadraticSieve::Factorize(const long_int & n)
 long_int QuadraticSieve::CheckResults(SieveResult & result, const GaussianBasic::Bitset & solution, const long_int & n)
 {
     long_int x = 1;
-    Factor factor;
+    FactorSet factor;
     for (size_t i = 0; i < result.factors.size(); ++i)
     {
         if (solution.participants[i])
         {
             x = (x * (result.r + result.positions[i])) % n;
-            MergeFactors(factor, result.factors[i]);
+            MergeFactorSets(factor, result.factors[i]);
         }
     }
     long_int y = 1;
@@ -85,7 +86,7 @@ long_int QuadraticCongruences::FindStartValue(const long_int & n, const long_int
     while (true)
     {
         long_int h = gen();
-        if (LegendreSymbol::Compute(h * h - 4 * n, p) == -1)
+        if (ComputeLegendreSymbol(h * h - 4 * n, p) == -1)
         {
             return h;
         }
@@ -199,19 +200,19 @@ void Sieve::CacheSaveFill(size_t i, size_t j, size_t p, std::vector<float> & log
     }
 }
 
-std::optional<Factor> Sieve::IsDecomposed(Config & cf, size_t i, const long_int & n)
+std::optional<FactorSet> Sieve::IsDecomposed(Config & cf, size_t i, const long_int & n)
 {
     long_int r = boost::multiprecision::sqrt(n) - cf.m;
     long_int value = F(r, n, i);
-    Factor factor;
+    FactorSet factor;
     for (auto p : cf.primes)
     {
         if (value % p == 0)
         {
-            factor[p] += FullDivFast(value, p);
+            factor[p] += ExtractPowerFast(value, p);
         }
     }
-    return value == 1 ? std::optional<Factor>(factor) : std::nullopt;
+    return value == 1 ? std::optional<FactorSet>(factor) : std::nullopt;
 }
 
 long_int Sieve::F(const long_int & r, const long_int & n, size_t i)

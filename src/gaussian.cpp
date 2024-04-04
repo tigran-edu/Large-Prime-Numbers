@@ -3,7 +3,7 @@
 namespace lpn
 {
 
-GaussianBasic::GaussianBasic(const std::vector<Factor> & factors, const std::vector<size_t> & primes)
+GaussianBasic::GaussianBasic(const std::vector<FactorSet> & factors, const std::vector<size_t> & primes)
     : n_(factors.size()), m_(primes.size()), factors_(factors)
 
 {

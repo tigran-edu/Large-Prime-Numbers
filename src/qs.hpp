@@ -15,7 +15,7 @@ struct SieveResult
     long_int r;
     std::vector<size_t> primes;
     std::vector<size_t> positions;
-    std::vector<Factor> factors;
+    std::vector<FactorSet> factors;
 };
 
 class QuadraticCongruences
@@ -32,7 +32,7 @@ class QuadraticCongruences
 class QuadraticSieve
 {
    public:
-    static Factor Factorize(const long_int & n);
+    static FactorSet Factorize(const long_int & n);
     static long_int CheckResults(SieveResult & result, const GaussianBasic::Bitset & solution, const long_int & n);
 };
 
@@ -56,7 +56,7 @@ struct Sieve
             size_t p = 3;
             while (primes.size() <= factor_size)
             {
-                if (BasicIsPrime(p) && LegendreSymbol::Compute(n, p) == 1)
+                if (IsPrimeBasic(p) && ComputeLegendreSymbol(n, p) == 1)
                 {
                     primes.push_back(p);
                     congruences.push_back(QuadraticCongruences::SolvingQuadraticCongruences(n, p));
@@ -80,7 +80,7 @@ struct Sieve
     static SieveResult Sieving(const long_int & n);
     static void Fill(size_t i, size_t p, std::vector<float> & logs);
     static void CacheSaveFill(size_t i, size_t j, size_t p, std::vector<float> & logs);
-    static std::optional<Factor> IsDecomposed(Config & cf, size_t i, const long_int & n);
+    static std::optional<FactorSet> IsDecomposed(Config & cf, size_t i, const long_int & n);
     static long_int F(const long_int & r, const long_int & n, size_t i);
 };
 

@@ -11,14 +11,14 @@ using namespace lpn;  // NOLINT
 TEST(GaussianBasic, mask)
 {
     std::vector<size_t> primes = {2, 3, 5, 7, 11, 13};
-    std::vector<Factor> factors;
+    std::vector<FactorSet> factors;
     size_t test_size = primes.size() - 1;
     for (size_t i = 0; i < test_size; ++i)
     {
-        factors.push_back(std::move(BasicFactorization(primes[i] * primes[i + 1])));
+        factors.push_back(FactorizeBasic(primes[i] * primes[i + 1]));
     }
     auto gaus = GaussianBasic(factors, primes);
-    auto matrix = std::move(gaus.Solve());
+    auto matrix = gaus.Solve();
     for (size_t i = 0; i < matrix.size(); ++i)
     {
         boost::dynamic_bitset<> answer(6);
@@ -31,14 +31,14 @@ TEST(GaussianBasic, mask)
 TEST(GaussianBasic, participants)
 {
     std::vector<size_t> primes = {2, 3, 5, 7, 11, 13};
-    std::vector<Factor> factors;
+    std::vector<FactorSet> factors;
     size_t test_size = primes.size() - 1;
     for (size_t i = 0; i < test_size; ++i)
     {
-        factors.push_back(std::move(BasicFactorization(primes[i] * primes[i + 1])));
+        factors.push_back(FactorizeBasic(primes[i] * primes[i + 1]));
     }
     auto gaus = GaussianBasic(factors, primes);
-    auto matrix = std::move(gaus.Solve());
+    auto matrix = gaus.Solve();
     for (size_t i = 0; i < matrix.size(); ++i)
     {
         boost::dynamic_bitset<> answer(5);
@@ -54,16 +54,16 @@ TEST(GaussianBasic, random)
 {
     boost::mt19937 rng(42);
     std::vector<size_t> primes = {2, 3, 5, 7, 11, 13};
-    std::vector<Factor> factors;
+    std::vector<FactorSet> factors;
     size_t test_size = 10;
     for (size_t i = 0; i < test_size; ++i)
     {
         std::vector<size_t> tmp;
         std::sample(primes.begin(), primes.end(), std::back_inserter(tmp), 4, rng);
-        factors.push_back(std::move(BasicFactorization(tmp[0] * tmp[0] * tmp[1] * tmp[1] * tmp[2] * tmp[3])));
+        factors.push_back(FactorizeBasic(tmp[0] * tmp[0] * tmp[1] * tmp[1] * tmp[2] * tmp[3]));
     }
     auto gaus = GaussianBasic(factors, primes);
-    auto matrix = std::move(gaus.Solve());
+    auto matrix = gaus.Solve();
     for (auto & line : matrix)
     {
         if (line.mask.none())

@@ -31,7 +31,7 @@ RUN cd /tmp && \
 
 WORKDIR /project
 
-COPY ./ ./
+COPY ../ ./
 
 CMD cmake . && \
     cmake --build ./ --config Release && \

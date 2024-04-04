@@ -70,7 +70,7 @@ TEST(Sieve, QuadraticCongruencesHeavy)
 //         for (const long_int & p2 : primes)
 //         {
 //             long_int value = p1 * p2;
-//             Factor factor = QuadraticSieve::Factorize(value);
+//             FactorSet factor = QuadraticSieve::Factorize(value);
 //             for (auto & [key, value] : factor)
 //             {
 //                 std::cout << key << " " << value << std::endl;

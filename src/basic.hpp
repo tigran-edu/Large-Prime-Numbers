@@ -1,24 +1,19 @@
 #pragma once
 
-#include <iostream>
-#include <map>
-
-#include "boost/multiprecision/cpp_int.hpp"
+#include "aliases.hpp"
 
 namespace lpn
 {
-using long_int = boost::multiprecision::cpp_int;  // NOLINT
-using Factor = std::unordered_map<long_int, size_t>;
 
-void MergeFactors(Factor & first, const Factor & second);
+void MergeFactorSets(FactorSet & first, const FactorSet & second);
 
-long_int Eval(const Factor & factor);
+long_int Eval(const FactorSet & factor);
 
 long_int FastExponentiation(long_int a, long_int b);
 long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m);
 
-size_t FullDiv(long_int & a, const long_int & b);
-size_t FullDivFast(long_int & a, const long_int & b, size_t i = 1);
+size_t ExtractPower(long_int & a, const long_int & b);
+size_t ExtractPowerFast(long_int & a, const long_int & b);
 
 template <typename T>
 T gcd(T a, T b)  // NOLINT
@@ -30,10 +25,10 @@ T gcd(T a, T b)  // NOLINT
     return a;
 }
 
-template <size_t N>
-bool PseudoPrimeTest(const long_int & p, const std::array<long_int, N> & primes)
+template <typename Container>
+bool IsPseudoPrime(const long_int & p, const Container & primes)
 {
-    for (auto & prime : primes)
+    for (const auto & prime : primes)
     {
         if (p % prime == 0 || FastExponentiationWithMod(prime, p - 1, p) != 1)
         {
@@ -43,8 +38,8 @@ bool PseudoPrimeTest(const long_int & p, const std::array<long_int, N> & primes)
     return true;
 }
 
-template <size_t N>
-bool StrongPseudoPrimeTest(const long_int & p, const std::array<long_int, N> & primes)
+template <typename Container>
+bool IsStrongPseudoPrime(const long_int & p, const Container & primes)
 {
     if (p % 2 == 0)
     {
@@ -53,18 +48,13 @@ bool StrongPseudoPrimeTest(const long_int & p, const std::array<long_int, N> & p
     for (auto & prime : primes)
     {
         long_int t = p - 1;
-        size_t a = 0;
-        while (t % 2 == 0)
-        {
-            t /= 2;
-            a += 1;
-        }
+        size_t a = ExtractPowerFast(t, 2);
         long_int test = FastExponentiationWithMod(prime, t, p);
         if (test == 1 || test == p - 1)
         {
             return true;
         }
-        for (size_t i = 1; i < a - 1; ++i)
+        for (size_t i = 1; i < a; ++i)
         {
             test = (test * test) % p;
             if (test == p - 1)
@@ -76,17 +66,12 @@ bool StrongPseudoPrimeTest(const long_int & p, const std::array<long_int, N> & p
     return false;
 }
 
-class LegendreSymbol
-{
-   public:
-    static int Compute(long_int n, long_int p);
+int ComputeLegendreSymbol(long_int n, long_int p);
 
-   private:
-    static void PullTwos(long_int & n, int & legendre, const long_int & p);
-};
+FactorSet FactorizeBasic(long_int a);
 
-Factor BasicFactorization(long_int a);
+bool IsPrimeBasic(const long_int & a);
 
-bool BasicIsPrime(const long_int & a);
+long_int PowBasic(const long_int & a, long_int b);
 
 };  // namespace lpn
