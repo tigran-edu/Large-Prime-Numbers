@@ -1,102 +1,95 @@
 #include "rho_factorization.hpp"
-#include "basic.hpp"
-
-#include <boost/random.hpp>
-#include <iostream>
-
-enum
-{
-    DEF_C_VALUE = 3,
-    DEF_FREQ_VALUE = 10,
-    DEF_MAX_ITER_VALUE = 10000000,
-    MAX_ATTEMP = 100,
-};
 
 namespace lpn
 {
 
 RhoFactorization::RhoFactorization()
-{
-    c_ = DEF_C_VALUE;
-    max_iter_amount_ = DEF_MAX_ITER_VALUE;
-    frequency_ = DEF_FREQ_VALUE;
-}
-
-RhoFactorization::RhoFactorization(const long_int & c, const size_t & max, const size_t & frequency)
-    : c_(c), max_iter_amount_(max), frequency_(frequency)
+    : c_(BasicConfig::kDefCValue),
+      max_iter_(BasicConfig::kDefMaxIterValue),
+      frequency_(BasicConfig::kDefFreqValue),
+      max_attemp_(BasicConfig::kDefMaxAttempValue)
 {
 }
 
-FactorSet RhoFactorization::Factorize(long_int n, long_int x1)
+RhoFactorization::RhoFactorization(const long_int & c, size_t max_iter, size_t frequency, size_t max_attemp)
+    : c_(c), max_iter_(max_iter), frequency_(frequency), max_attemp_(max_attemp)
 {
-    std::cout << "Start to factorize number " << n << '\n';
+}
+
+FactorSet RhoFactorization::Factorize(const long_int & n, size_t starting_point)
+{
     FactorSet factor;
+    long_int x1 = starting_point;
 
-    for (size_t i = 0; i < MAX_ATTEMP && n > 1; ++i)
+    for (size_t i = 0; i < max_attemp_ && n > 1; ++i)
     {
-        auto divisor = FindNewDivisor(n, x1);
-        factor[divisor] += ExtractPowerFast(n, divisor);
-        NotifyUser(divisor);
+        long_int divisor = FindDivisor(n, x1);
+        if (divisor != 1 && divisor != n)
+        {
+            factor[divisor] += 1;
+            factor[n / divisor] += 1;
+            return factor;
+        }
     }
-    PrintResult(factor);
+    factor[n] = 1;
     return factor;
 }
 
-long_int RhoFactorization::FindNewDivisor(long_int & n, long_int & x1)
+size_t RhoFactorization::ComputeNextRange(size_t range) { return range << 1; }
+
+void RhoFactorization::UpdateX1(const long_int & x2, long_int & x1) { x1 = x2; }
+
+void RhoFactorization::UpdateX2(const long_int & n, size_t range, long_int & x2)
 {
-    const std::array<long_int, 7> primes = {2, 3, 5, 7, 11, 13, 61631};
-    if (IsPseudoPrime(n, primes))
+    for (size_t j = 0; j < range; ++j)
     {
-        std::cout << "Warning: Value " << n << " is Pseudoprime\n";
-        return n;
+        x2 = Next(x2, n);
     }
+}
+
+std::optional<long_int> RhoFactorization::TryToFindDivisor(const long_int & n, size_t range, size_t terms,
+                                                           long_int & x1, long_int & x2)
+{
+    long_int product = 1;
+    long_int divisor = 1;
+    for (size_t j = 0; j < range; ++j)
+    {
+        x2 = Next(x2, n);
+        product = (product * abs(x1 - x2)) % n;
+        if (product == 0)
+        {
+            product = 1;
+        }
+        terms++;
+        if ((terms % frequency_ == 0 || j + 1 == range) && ((divisor = lpn::gcd(n, product)) > 1))
+        {
+            return divisor;
+        }
+    }
+    return std::nullopt;
+}
+
+long_int RhoFactorization::FindDivisor(const long_int & n, long_int & x1)
+{
+    static const std::array<long_int, 7> kPrimes = {2, 3, 5, 7, 11, 13};
     long_int x2 = Next(x1, n);
     size_t range = 1;
     size_t terms = 0;
-    while (terms <= max_iter_amount_ && !IsPseudoPrime(n, primes))
+    while (terms <= max_iter_ && !IsPseudoPrime(n, kPrimes))
     {
-        long_int product = 1;
-        for (size_t j = 0; j < range; ++j)
+        auto divisor = TryToFindDivisor(n, range, terms, x1, x2);
+        if (divisor.has_value())
         {
-            x2 = Next(x2, n);
-            product = (product * abs(x1 - x2)) % n;
-            if (product == 0)
-            {
-                product = 1;
-            }
-            terms++;
-            if (terms % frequency_ == 0 || j + 1 == range)
-            {
-                auto g = lpn::gcd(n, product);
-                if (g > 1)
-                {
-                    return g;
-                }
-            }
+            return divisor.value();
         }
-        x1 = x2;
-        range <<= 1;
-        for (size_t j = 0; j < range; ++j)
-        {
-            x2 = Next(x2, n);
-        }
+        terms += range;
+        range = ComputeNextRange(range);
+        UpdateX1(x2, x1);
+        UpdateX2(n, range, x2);
     }
-    std::cerr << "No denominators were found. Please try again with different parameters.\n";
     return n;
 }
 
 long_int RhoFactorization::Next(const long_int & x2, const long_int & n) { return (x2 * x2 + c_) % n; }
-
-void RhoFactorization::PrintResult(const FactorSet & factor)
-{
-    std::cout << "RESULT:\n";
-    for (const auto & [div, deg] : factor)
-    {
-        std::cout << "Divisor " << div << " "
-                  << "Degree " << deg << '\n';
-    }
-}
-
-void RhoFactorization::NotifyUser(const long_int & div) { std::cout << "New divisor has been found " << div << '\n'; }
 
 };  // namespace lpn
