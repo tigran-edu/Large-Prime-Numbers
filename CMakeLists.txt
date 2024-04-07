@@ -15,9 +15,14 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     set (CMAKE_CXX_FLAGS_DEBUG               "${CMAKE_CXX_FLAGS_DEBUG} -O0 ${DEBUG_INFO_FLAGS} ${CMAKE_CXX_FLAGS_ADD}")
 endif()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set (ASAN true)
+endif()
+
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(cmake/glob_sources.cmake)
+include(cmake/sanitize.cmake)
 
 enable_testing()
 
