@@ -1,4 +1,5 @@
 #include "basic.hpp"
+#include "boost/random.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/pow.hpp>
@@ -132,6 +133,44 @@ TEST(Basic, LegendreSymbol)
     ASSERT_EQ(ComputeLegendreSymbol(144, 7), 1);
     ASSERT_EQ(ComputeLegendreSymbol(145, 7), -1);
     ASSERT_EQ(ComputeLegendreSymbol(453, 13), -1);
+}
+
+TEST(Basic, LegendreSymbolRandom)
+{
+    boost::mt19937 rng(42);
+    {
+        long_int p = 51439;
+        for (size_t i = 1; i < 20000; ++i)
+        {
+            long_int value = p * rng() + i * i;
+            ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
+        }
+    }
+
+    {
+        long_int p = 56287631;
+        for (size_t i = 1; i < 20000; ++i)
+        {
+            long_int value = p * rng() + p - 1;
+            ASSERT_TRUE(ComputeLegendreSymbol(value, p) == -1);
+        }
+    }
+
+    {
+        long_int p("850089435441534261939703688213");
+        for (size_t i = 1; i < 20000; ++i)
+        {
+            long_int value = p * rng() + i * i;
+            ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
+        }
+    }
+}
+
+TEST(Basic, LegendreSymbolRandomLarge)
+{
+    long_int value("1136576893960171706831330319665099465299");
+    long_int p("706546294168342682401061556019");
+    ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
 }
 
 TEST(Factorization, BasicPrime)
