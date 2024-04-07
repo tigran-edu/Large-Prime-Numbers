@@ -2,7 +2,6 @@
 #include "boost/random.hpp"
 
 #include <gtest/gtest.h>
-#include <vector>
 #include <fstream>
 
 namespace
@@ -10,7 +9,15 @@ namespace
 
 using namespace lpn;  // NOLINT
 
-bool Check(const long_int & x, const long_int & p, const size_t i) { return (x * x) % p == i * i; }
+bool Check(const long_int & x, const long_int & p, const size_t i) { return (x * x) % p == (i * i) % p; }
+
+TEST(Sieve, QuadraticCongruencesBasic)
+{
+    long_int p = 41;
+    long_int value = 64;
+    ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
+    ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, 8));
+}
 
 TEST(Sieve, QuadraticCongruencesRandom)
 {
@@ -20,6 +27,7 @@ TEST(Sieve, QuadraticCongruencesRandom)
         for (size_t i = 1; i < 20000; ++i)
         {
             long_int value = p * rng() + i * i;
+            ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
             ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, i));
         }
     }
@@ -29,6 +37,7 @@ TEST(Sieve, QuadraticCongruencesRandom)
         for (size_t i = 1; i < 20000; ++i)
         {
             long_int value = p * rng() + i * i;
+            ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
             ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, i));
         }
     }
@@ -41,6 +50,7 @@ TEST(Sieve, QuadraticCongruencesRandom)
             for (size_t i = 1; i < 2000; ++i)
             {
                 long_int value = p * rng() + i * i;
+                ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
                 ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, i));
             }
         }
@@ -62,23 +72,21 @@ TEST(Sieve, QuadraticCongruencesHeavy)
     }
 }
 
-// TEST(Sieve, QuadraticSieve)
-// {
-//     const std::array<long_int, 4> primes = {391708601274539, 136564985324737, 261009627419033, 630274293935959};
-//     for (const long_int & p1 : primes)
-//     {
-//         for (const long_int & p2 : primes)
-//         {
-//             long_int value = p1 * p2;
-//             FactorSet factor = QuadraticSieve::Factorize(value);
-//             for (auto & [key, value] : factor)
-//             {
-//                 std::cout << key << " " << value << std::endl;
-//             }
-//             std::cout << factor[p1] << " " << factor[p2] << std::endl;
-//             ASSERT_TRUE(factor[p1] == 1 && factor[p2] == 1 && factor.size() == 2);
-//         }
-//     }
-// }
+TEST(Sieve, QuadraticSieve)
+{
+    long_int n("59469489332848408438249254427481121839977");  // 338555568168236555657 * 175656509371887105761
+    FactorSet factor = QuadraticSieve::Factorize(n);
+    ASSERT_EQ(factor.size(), 2);
+    ASSERT_EQ(Eval(factor), n);
+}
+
+TEST(Sieve, QuadraticSieveWithConfig)
+{
+    long_int n("4482406424966880742829846540605971439398287609");  // 86738535685150523290199 * 51677220390685710220591
+    auto config = Sieve::CreateConfig(n, 500'000'000, 5000, 1);
+    FactorSet factor = QuadraticSieve::Factorize(n, config);
+    ASSERT_EQ(factor.size(), 2);
+    ASSERT_EQ(Eval(factor), n);
+}
 
 };  // namespace

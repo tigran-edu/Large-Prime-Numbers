@@ -28,8 +28,10 @@ class RhoFactorization
     void UpdateX2(const long_int & n, size_t range, long_int & x2);
     std::optional<long_int> TryToFindDivisor(const long_int & n, size_t terms, size_t range, long_int & x1,
                                              long_int & x2);
+
     long_int FindDivisor(const long_int & n, long_int & x1);
     long_int Next(const long_int & x2, const long_int & n);
+
     const long_int c_;
     const size_t max_iter_;
     const size_t frequency_;
