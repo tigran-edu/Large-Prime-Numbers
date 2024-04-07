@@ -2,8 +2,6 @@
 
 #include <optional>
 
-#include "aliases.hpp"
-#include "basic.hpp"
 #include "gaussian.hpp"
 
 namespace lpn

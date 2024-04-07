@@ -2,23 +2,29 @@
 
 namespace lpn
 {
-using Line = GaussianBasic::Line;
-using Matrix = GaussianBasic::Matrix;
+GaussianBasic::Line::Line(size_t n, size_t m) : participants(n), mask(m) {}
+
+GaussianBasic::Line & GaussianBasic::Line::operator^=(Line & line)
+{
+    mask ^= line.mask;
+    participants ^= line.participants;
+    return *this;
+}
 
 GaussianBasic::GaussianBasic(const FactorSets & factors, const std::vector<size_t> & primes)
-    : n_(factors.size()), m_(primes.size()), matrix_(CreateMatrix(factors, primes)), factors_(factors)
+    : n_(factors.size()), m_(primes.size()), matrix_(CreateMatrix(factors, primes))
 {
 }
 
-Matrix GaussianBasic::CreateMatrix(const FactorSets & factors, const std::vector<size_t> & primes)
+GaussianBasic::Matrix GaussianBasic::CreateMatrix(const FactorSets & factors, const std::vector<size_t> & primes)
 {
     size_t n = factors.size();
     size_t m = primes.size();
 
-    Matrix matrix;
+    Matrix matrix = Matrix(n);
     for (size_t i = 0; i < n; ++i)
     {
-        matrix.push_back(Line(n, m));
+        matrix[i] = Line(n, m);
         for (size_t j = 0; j < m; ++j)
         {
             auto iter = factors[i].find(primes[j]);
@@ -32,7 +38,7 @@ Matrix GaussianBasic::CreateMatrix(const FactorSets & factors, const std::vector
     return matrix;
 }
 
-size_t GaussianBasic::FindFirstNonZeroInLine(size_t line_pos)
+size_t GaussianBasic::FindFirstNonZeroInLine(size_t line_pos) const
 {
     for (size_t col = 0; col < m_; ++col)
     {
@@ -44,7 +50,7 @@ size_t GaussianBasic::FindFirstNonZeroInLine(size_t line_pos)
     return m_;
 }
 
-std::vector<Line> GaussianBasic::Solve()
+GaussianBasic::Matrix GaussianBasic::Solve()
 {
     for (size_t i = 0; i < n_; ++i)
     {

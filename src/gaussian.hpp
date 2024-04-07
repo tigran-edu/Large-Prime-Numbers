@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include <boost/dynamic_bitset.hpp>
 #include "basic.hpp"
 
@@ -12,14 +11,10 @@ class GaussianBasic
     class Line
     {
        public:
-        Line(size_t n, size_t m) : participants(n), mask(m) {}
+        Line() = default;
+        Line(size_t n, size_t m);
 
-        Line & operator^=(Line & line)
-        {
-            mask ^= line.mask;
-            participants ^= line.participants;
-            return *this;
-        }
+        Line & operator^=(Line & line);
 
         boost::dynamic_bitset<> participants;
         boost::dynamic_bitset<> mask;
@@ -33,7 +28,7 @@ class GaussianBasic
 
     Matrix Solve();
 
-    size_t FindFirstNonZeroInLine(size_t line_pos);
+    size_t FindFirstNonZeroInLine(size_t line_pos) const;
 
     void Add(size_t col, size_t line);
 
@@ -41,6 +36,5 @@ class GaussianBasic
     size_t m_;
     size_t n_;
     Matrix matrix_;
-    const FactorSets & factors_;
 };
 };  // namespace lpn
