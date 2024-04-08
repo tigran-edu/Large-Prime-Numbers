@@ -35,7 +35,7 @@ FactorSet RhoFactorization::Factorize(const long_int & n, size_t starting_point)
     return factor;
 }
 
-size_t RhoFactorization::ComputeNextRange(size_t range) { return range << 1; }
+size_t RhoFactorization::ComputeNextRange(size_t range) const { return range << 1; }
 
 void RhoFactorization::UpdateX1(const long_int & x2, long_int & x1) { x1 = x2; }
 
@@ -71,11 +71,10 @@ std::optional<long_int> RhoFactorization::TryToFindDivisor(const long_int & n, s
 
 long_int RhoFactorization::FindDivisor(const long_int & n, long_int & x1)
 {
-    static const std::array<long_int, 7> kPrimes = {2, 3, 5, 7, 11, 13};
     long_int x2 = Next(x1, n);
     size_t range = 1;
     size_t terms = 0;
-    while (terms <= max_iter_ && !IsPseudoPrime(n, kPrimes))
+    while (terms <= max_iter_ && !IsPseudoPrime(n, BasicConfig::kPrimes))
     {
         auto divisor = TryToFindDivisor(n, range, terms, x1, x2);
         if (divisor.has_value())
@@ -90,6 +89,6 @@ long_int RhoFactorization::FindDivisor(const long_int & n, long_int & x1)
     return n;
 }
 
-long_int RhoFactorization::Next(const long_int & x2, const long_int & n) { return (x2 * x2 + c_) % n; }
+long_int RhoFactorization::Next(const long_int & x2, const long_int & n) const { return (x2 * x2 + c_) % n; }
 
 };  // namespace lpn

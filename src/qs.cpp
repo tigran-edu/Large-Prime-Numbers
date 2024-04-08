@@ -49,7 +49,7 @@ void Config::ComputeSmallPrimes(const long_int & n)
         if (IsPrimeBasic(p) && ComputeLegendreSymbol(n, p) == 1)
         {
             primes_.push_back(p);
-            congruences_.push_back(QuadraticCongruences::SolvingQuadraticCongruences(n, p));
+            congruences_.push_back(QuadraticCongruences::Solve(n, p));
         }
     }
 }
@@ -57,22 +57,22 @@ void Config::ComputeSmallPrimes(const long_int & n)
 FactorSet QuadraticSieve::Factorize(const long_int & n, const Sieve::Config & config)
 {
     FactorSet factor;
-    auto solution = Sieve::Sieving(n, config);
+    auto solution = Sieve::Solve(n, config);
     GaussianBasic gs = GaussianBasic(solution.factors, solution.primes);
-    auto solutions = gs.Solve();
-    return FindFactor(solution, solutions, n);
+    auto matrix = gs.Solve();
+    return FindFactor(solution, matrix, n);
 }
 
 FactorSet QuadraticSieve::Factorize(const long_int & n) { return Factorize(n, Sieve::CreateConfig(n)); }
 
 bool QuadraticSieve::IsPerfectSquare(const boost::dynamic_bitset<> & mask) { return mask.none(); }
 
-std::vector<size_t> QuadraticSieve::GetParticipantsPositions(const Line & solution)
+std::vector<size_t> QuadraticSieve::GetParticipantsPositions(const Line & line)
 {
     std::vector<size_t> positions;
-    for (size_t i = 0; i < solution.participants.size(); ++i)
+    for (size_t i = 0; i < line.participants.size(); ++i)
     {
-        if (solution.participants[i])
+        if (line.participants[i])
         {
             positions.push_back(i);
         }
@@ -108,14 +108,14 @@ long_int QuadraticSieve::ComputeY(const Sieve::Solution & solution, const std::v
     return y;
 }
 
-FactorSet QuadraticSieve::FindFactor(const Sieve::Solution & solution, const Matrix & solutions, const long_int & n)
+FactorSet QuadraticSieve::FindFactor(const Sieve::Solution & solution, const Matrix & matrix, const long_int & n)
 {
     FactorSet factor;
-    for (const auto & sol : solutions)
+    for (const auto & line : matrix)
     {
-        if (IsPerfectSquare(sol.mask))
+        if (IsPerfectSquare(line.mask))
         {
-            auto positions = GetParticipantsPositions(sol);
+            auto positions = GetParticipantsPositions(line);
             long_int x = ComputeX(solution, positions, n);
             long_int y = ComputeY(solution, positions, n);
             long_int gcd = lpn::gcd<long_int>(math::abs(x - y), n);
@@ -131,7 +131,7 @@ FactorSet QuadraticSieve::FindFactor(const Sieve::Solution & solution, const Mat
     return factor;
 }
 
-long_int QuadraticCongruences::SolvingQuadraticCongruences(const long_int & n, const long_int & p)
+long_int QuadraticCongruences::Solve(const long_int & n, const long_int & p)
 {
     assert(p % 2 != 0);
 
@@ -148,14 +148,14 @@ long_int QuadraticCongruences::SolvingQuadraticCongruences(const long_int & n, c
         return (FastExponentiationWithMod(4 * n, (p + 3) / 8, p) * (p + 1) / 2) % p;
     }
     long_int h = FindStartValue(n, p);
-    return (Solve(n, h, p) * (p + 1) / 2) % p;
+    return (SolveCongruence(n, h, p) * (p + 1) / 2) % p;
 }
 
 long_int QuadraticCongruences::FindStartValue(const long_int & n, const long_int & p)
 {
     static std::mt19937 gen{42};
+    static std::uniform_int_distribution<size_t> distrib(1, UINT64_MAX);
     long_int h = 1;
-    std::uniform_int_distribution<size_t> distrib(1, UINT64_MAX);
     while (ComputeLegendreSymbol(h * h - 4 * n, p) != -1)
     {
         h = distrib(gen);
@@ -163,7 +163,7 @@ long_int QuadraticCongruences::FindStartValue(const long_int & n, const long_int
     return h;
 }
 
-long_int QuadraticCongruences::Solve(const long_int & n, const long_int & h, const long_int & p)
+long_int QuadraticCongruences::SolveCongruence(const long_int & n, const long_int & h, const long_int & p)
 {
     long_int m = n;
     long_int v = h;
@@ -201,7 +201,7 @@ std::vector<bool> QuadraticCongruences::ToBinaryFormat(long_int val)
     return bitset;
 }
 
-Sieve::Solution Sieve::Sieving(const long_int & n, const Config & config)
+Sieve::Solution Sieve::Solve(const long_int & n, const Config & config)
 {
     Sieve::Solution solution;
     std::vector<float> logs(2 * config.segment_size_, 0.0);

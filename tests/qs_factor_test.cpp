@@ -16,7 +16,7 @@ TEST(Sieve, QuadraticCongruencesBasic)
     long_int p = 41;
     long_int value = 64;
     ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
-    ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, 8));
+    ASSERT_TRUE(Check(QuadraticCongruences::Solve(value, p), p, 8));
 }
 
 TEST(Sieve, QuadraticCongruencesRandom)
@@ -28,7 +28,7 @@ TEST(Sieve, QuadraticCongruencesRandom)
         {
             long_int value = p * rng() + i * i;
             ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
-            ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, i));
+            ASSERT_TRUE(Check(QuadraticCongruences::Solve(value, p), p, i));
         }
     }
 
@@ -38,7 +38,7 @@ TEST(Sieve, QuadraticCongruencesRandom)
         {
             long_int value = p * rng() + i * i;
             ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
-            ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, i));
+            ASSERT_TRUE(Check(QuadraticCongruences::Solve(value, p), p, i));
         }
     }
 
@@ -51,7 +51,7 @@ TEST(Sieve, QuadraticCongruencesRandom)
             {
                 long_int value = p * rng() + i * i;
                 ASSERT_TRUE(ComputeLegendreSymbol(value, p) == 1);
-                ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, i));
+                ASSERT_TRUE(Check(QuadraticCongruences::Solve(value, p), p, i));
             }
         }
     }
@@ -67,7 +67,7 @@ TEST(Sieve, QuadraticCongruencesHeavy)
         for (size_t i = 1'000'000; i < 1'002'000; ++i)
         {
             long_int value = p * rng() + i * i;
-            ASSERT_TRUE(Check(QuadraticCongruences::SolvingQuadraticCongruences(value, p), p, i));
+            ASSERT_TRUE(Check(QuadraticCongruences::Solve(value, p), p, i));
         }
     }
 }

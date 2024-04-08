@@ -130,9 +130,8 @@ FactorSet FactorizeBasic(long_int a)
         factor[2] += counter;
     }
 
-    long_int div = 3;
     long_int sqrt_a = boost::multiprecision::sqrt(a);
-    while (div <= sqrt_a)
+    for (long_int div = 3; div <= sqrt_a; div += 2)
     {
         if (auto counter = ExtractPowerFast(a, div); counter > 0)
         {
@@ -157,15 +156,13 @@ bool IsPrimeBasic(const long_int & a)
     {
         return false;
     }
-    long_int div = 3;
     long_int sqrt_a = boost::multiprecision::sqrt(a);
-    while (div <= sqrt_a)
+    for (long_int div = 3; div <= sqrt_a; div += 2)
     {
         if (a % div == 0)
         {
             return false;
         }
-        div += 2;
     }
 
     return true;
