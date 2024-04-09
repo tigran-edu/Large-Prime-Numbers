@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "gaussian.hpp"
+#include "base.hpp"
 
 namespace lpn
 {
@@ -41,42 +42,20 @@ class Sieve
         std::vector<long_int> congruences_;
     };
 
-    struct Solution
-    {
-        long_int r;
-        std::vector<size_t> primes;
-        std::vector<size_t> positions;
-        FactorSets factors;
-    };
-
     static Solution Solve(const long_int & n, const Config & config);
     static Config CreateConfig(const long_int & n);
     static Config CreateConfig(const long_int & n, size_t segment_size, size_t factor_size, float expansion_rate);
 
    private:
     static void AddLogAtSpecificPositions(size_t i, size_t j, size_t p, std::vector<float> & logs);
-    static std::optional<FactorSet> TryToDecompose(const Config & config, size_t i, const long_int & n);
     static long_int ComputeTargetFunction(const long_int & r, const long_int & n, size_t i);
 };
 
-class QuadraticSieveFactorization
+class QuadraticSieveFactorization : private FactorizationBase
 {
    public:
     static FactorSet Factorize(const long_int & n);
     static FactorSet Factorize(const long_int & n, const Sieve::Config & config);
-
-   private:
-    using Matrix = GaussianBasic::Matrix;
-    using Line = GaussianBasic::Line;
-
-   private:
-    static bool IsPerfectSquare(const boost::dynamic_bitset<> & mask);
-    static FactorSet FindFactor(const Sieve::Solution & solution, const Matrix & matrix, const long_int & n);
-    static std::vector<size_t> GetParticipantsPositions(const Line & line);
-    static long_int ComputeX(const Sieve::Solution & solution, const std::vector<size_t> & positions,
-                             const long_int & n);
-    static long_int ComputeY(const Sieve::Solution & solution, const std::vector<size_t> & positions,
-                             const long_int & n);
 };
 
 };  // namespace lpn

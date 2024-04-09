@@ -33,8 +33,6 @@ class GaussianBasic
 
     void Add(size_t col, size_t line);
 
-    static std::vector<size_t> GetParticipantsPositions(const Line & line);
-
    private:
     size_t m_;
     size_t n_;

@@ -1,5 +1,6 @@
 #include "qs.hpp"
 #include "congruence.hpp"
+#include "gaussian.hpp"
 
 namespace lpn
 {
@@ -15,7 +16,7 @@ Config Sieve::CreateConfig(const long_int & n, size_t segment_size, size_t facto
     config.ComputeSmallPrimes(n);
     config.ComputeTarget(n);
     config.ComputeCloseness(expansion_rate);
-    return config;
+    return config;  // Дима, эта функция была написана ради тебя ❤❤❤
 }
 
 Config Sieve::CreateConfig(const long_int & n)
@@ -62,74 +63,7 @@ FactorSet QuadraticSieveFactorization::Factorize(const long_int & n, const Sieve
 
 FactorSet QuadraticSieveFactorization::Factorize(const long_int & n) { return Factorize(n, Sieve::CreateConfig(n)); }
 
-bool QuadraticSieveFactorization::IsPerfectSquare(const boost::dynamic_bitset<> & mask) { return mask.none(); }
-
-std::vector<size_t> QuadraticSieveFactorization::GetParticipantsPositions(const Line & line)
-{
-    std::vector<size_t> positions;
-    for (size_t i = 0; i < line.participants.size(); ++i)
-    {
-        if (line.participants[i])
-        {
-            positions.push_back(i);
-        }
-    }
-    return positions;
-}
-
-long_int QuadraticSieveFactorization::ComputeX(const Sieve::Solution & solution, const std::vector<size_t> & positions,
-                                               const long_int & n)
-{
-    long_int x = 1;
-    for (auto pos : positions)
-    {
-        x = (x * (solution.r + solution.positions[pos])) % n;
-    }
-    return x;
-}
-
-long_int QuadraticSieveFactorization::ComputeY(const Sieve::Solution & solution, const std::vector<size_t> & positions,
-                                               const long_int & n)
-{
-    long_int y = 1;
-    FactorSet factor;
-    for (auto pos : positions)
-    {
-        MergeFactorSets(factor, solution.factors[pos]);
-    }
-    for (auto [key, value] : factor)
-    {
-        assert(value % 2 == 0);
-        y = (y * FastExponentiationWithMod(key, value / 2, n)) % n;
-    }
-    return y;
-}
-
-FactorSet QuadraticSieveFactorization::FindFactor(const Sieve::Solution & solution, const Matrix & matrix,
-                                                  const long_int & n)
-{
-    FactorSet factor;
-    for (const auto & line : matrix)
-    {
-        if (IsPerfectSquare(line.mask))
-        {
-            auto positions = GetParticipantsPositions(line);
-            long_int x = ComputeX(solution, positions, n);
-            long_int y = ComputeY(solution, positions, n);
-            long_int gcd = lpn::gcd<long_int>(math::abs(x - y), n);
-            if (gcd != 1 && gcd != n)
-            {
-                factor[gcd] = 1;
-                factor[n / gcd] = 1;
-                return factor;
-            }
-        }
-    }
-    factor[n] = 1;
-    return factor;
-}
-
-Sieve::Solution Sieve::Solve(const long_int & n, const Config & config)
+Solution Sieve::Solve(const long_int & n, const Config & config)
 {
     Solution solution;
     std::vector<float> logs(2 * config.segment_size_, 0.0);
@@ -146,19 +80,18 @@ Sieve::Solution Sieve::Solve(const long_int & n, const Config & config)
     for (size_t i = 0; i < logs.size(); ++i)
     {
         if (config.closeness_ <= logs[i] && logs[i] <= config.target_ &&
-            solution.positions.size() < 1.15 * config.factor_size_)
+            solution.values.size() < 1.1 * config.factor_size_)
         {
-            auto factor = TryToDecompose(config, i, n);
-            if (factor != std::nullopt)
+            auto factor = TryToDecompose(config.primes_, ComputeTargetFunction(r, n, i));
+            if (factor.has_value())
             {
-                solution.positions.push_back(i);
+                solution.values.push_back(i + r);
                 solution.factors.push_back(std::move(factor.value()));
             }
         }
     }
 
     solution.primes = std::move(config.primes_);
-    solution.r = r;
     return solution;
 }
 
@@ -193,21 +126,6 @@ void Sieve::AddLogAtSpecificPositions(size_t i, size_t j, size_t p, std::vector<
     {
         logs[i] += p_log;
     }
-}
-
-std::optional<FactorSet> Sieve::TryToDecompose(const Config & config, size_t i, const long_int & n)
-{
-    long_int r = math::sqrt(n) - config.segment_size_;
-    long_int value = ComputeTargetFunction(r, n, i);
-    FactorSet factor;
-    for (const auto p : config.primes_)
-    {
-        if (value % p == 0)
-        {
-            factor[p] += ExtractPowerFast(value, p);
-        }
-    }
-    return value == 1 ? std::optional<FactorSet>(factor) : std::nullopt;
 }
 
 long_int Sieve::ComputeTargetFunction(const long_int & r, const long_int & n, size_t i)

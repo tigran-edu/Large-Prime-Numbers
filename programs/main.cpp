@@ -9,7 +9,7 @@ int main()
 {
     using namespace lpn;  // NOLINT
 
-    long_int n("59469489332848408438249254427481121839977");
+    long_int n("4482406424966880742829846540605971439398287609");
     auto start = std::chrono::high_resolution_clock::now();
     FactorSet factor = ContinuedFractionsFactorization::Factorize(n, 1000);
     auto end = std::chrono::high_resolution_clock::now();

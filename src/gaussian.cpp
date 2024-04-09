@@ -76,17 +76,4 @@ void GaussianBasic::Add(size_t col, size_t line)
     }
 }
 
-std::vector<size_t> GaussianBasic::GetParticipantsPositions(const Line & line)
-{
-    std::vector<size_t> positions;
-    for (size_t i = 0; i < line.participants.size(); ++i)
-    {
-        if (line.participants[i])
-        {
-            positions.push_back(i);
-        }
-    }
-    return positions;
-}
-
 };  // namespace lpn

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aliases.hpp"
+#include <optional>
 
 namespace lpn
 {

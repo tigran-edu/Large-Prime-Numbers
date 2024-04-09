@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aliases.hpp"
+#include "base.hpp"
 #include "basic.hpp"
 #include "gaussian.hpp"
 
@@ -28,33 +29,14 @@ class ContinuedFractions
     };
 
    public:
-    struct Solution
-    {
-        FactorSets factors;
-        std::vector<long_int> xs;
-        std::vector<size_t> primes;
-    };
-
-   public:
     static Solution Solve(const long_int & n, size_t factor_size);
 };
 
-class ContinuedFractionsFactorization
+class ContinuedFractionsFactorization : private FactorizationBase
 {
-   private:
-    using Matrix = GaussianBasic::Matrix;
-    using Line = GaussianBasic::Line;
-    using Solution = ContinuedFractions::Solution;
-
    public:
     static FactorSet Factorize(const long_int & n);
     static FactorSet Factorize(const long_int & n, size_t factor_size);
-
-   private:
-    static long_int ComputeX(const Solution & solution, const std::vector<size_t> & positions, const long_int & n);
-    static long_int ComputeY(const Solution & solution, const std::vector<size_t> & positions, const long_int & n);
-    static bool IsPerfectSquare(const Line & line);
-    static FactorSet FindFactor(const Solution & solution, const Matrix & matrix, const long_int & n);
 
    private:
     static constexpr size_t kBasicFactorSize = 4000;
