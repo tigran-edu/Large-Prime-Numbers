@@ -111,4 +111,21 @@ std::vector<bool> QuadraticCongruences::ToBinaryFormat(long_int val)
     return bitset;
 }
 
+bool IsQuadraticResidue(const long_int & n, const long_int & p) { return ComputeLegendreSymbol(n, p) == 1; }
+
+std::vector<size_t> FindQuadraticResiduePrimes(const long_int & n, size_t factor_size)
+{
+    std::vector<size_t> primes(factor_size + 1);
+    primes[0] = 2;
+    for (size_t p = 3, i = 1; i <= factor_size; p += 2)
+    {
+        if (IsPrimeBasic(p) && IsQuadraticResidue(n, p))
+        {
+            primes[i] = p;
+            i += 1;
+        }
+    }
+    return primes;
+}
+
 };  // namespace lpn

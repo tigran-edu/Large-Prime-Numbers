@@ -6,6 +6,8 @@ namespace lpn
 {
 
 int ComputeLegendreSymbol(long_int n, long_int p);
+bool IsQuadraticResidue(const long_int & n, const long_int & p);
+std::vector<size_t> FindQuadraticResiduePrimes(const long_int & n, size_t factor_size);
 
 class QuadraticCongruences
 {

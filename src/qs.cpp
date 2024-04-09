@@ -131,7 +131,7 @@ FactorSet QuadraticSieveFactorization::FindFactor(const Sieve::Solution & soluti
 
 Sieve::Solution Sieve::Solve(const long_int & n, const Config & config)
 {
-    Sieve::Solution solution;
+    Solution solution;
     std::vector<float> logs(2 * config.segment_size_, 0.0);
     const long_int r = math::sqrt(n) - config.segment_size_;
 

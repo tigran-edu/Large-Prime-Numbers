@@ -66,6 +66,20 @@ bool IsStrongPseudoPrime(const long_int & p, const Container & primes)
     return false;
 }
 
+template <typename Container>
+static std::optional<FactorSet> TryToDecompose(const Container & primes, long_int n)
+{
+    FactorSet factor;
+    for (size_t i = 0; i < primes.size() && n > 1; ++i)
+    {
+        if (n % primes[i] == 0)
+        {
+            factor[primes[i]] += ExtractPowerFast(n, primes[i]);
+        }
+    }
+    return n == 1 ? std::optional<FactorSet>(factor) : std::nullopt;
+}
+
 FactorSet FactorizeBasic(long_int a);
 
 bool IsPrimeBasic(const long_int & a);

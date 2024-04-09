@@ -1,5 +1,5 @@
 #include <iostream>
-#include "qs.hpp"
+#include "cfrac.hpp"
 #include <chrono>
 
 // This file is used for testing purposes.
@@ -11,7 +11,7 @@ int main()
 
     long_int n("59469489332848408438249254427481121839977");
     auto start = std::chrono::high_resolution_clock::now();
-    FactorSet factor = QuadraticSieveFactorization::Factorize(n);
+    FactorSet factor = ContinuedFractionsFactorization::Factorize(n, 1000);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = duration_cast<std::chrono::microseconds>(end - start);
     std::cout << duration.count() / 1e6 << std::endl;

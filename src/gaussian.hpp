@@ -15,6 +15,7 @@ class GaussianBasic
         Line(size_t n, size_t m);
 
         Line & operator^=(Line & line);
+        bool IsMaskEmpty() const;
 
         boost::dynamic_bitset<> participants;
         boost::dynamic_bitset<> mask;
@@ -31,6 +32,8 @@ class GaussianBasic
     size_t FindFirstNonZeroInLine(size_t line_pos) const;
 
     void Add(size_t col, size_t line);
+
+    static std::vector<size_t> GetParticipantsPositions(const Line & line);
 
    private:
     size_t m_;

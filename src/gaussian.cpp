@@ -11,6 +11,8 @@ GaussianBasic::Line & GaussianBasic::Line::operator^=(Line & line)
     return *this;
 }
 
+bool GaussianBasic::Line::IsMaskEmpty() const { return mask.none(); }
+
 GaussianBasic::GaussianBasic(const FactorSets & factors, const std::vector<size_t> & primes)
     : n_(factors.size()), m_(primes.size()), matrix_(CreateMatrix(factors, primes))
 {
@@ -72,6 +74,19 @@ void GaussianBasic::Add(size_t col, size_t line)
             matrix_[i] ^= matrix_[line];
         }
     }
+}
+
+std::vector<size_t> GaussianBasic::GetParticipantsPositions(const Line & line)
+{
+    std::vector<size_t> positions;
+    for (size_t i = 0; i < line.participants.size(); ++i)
+    {
+        if (line.participants[i])
+        {
+            positions.push_back(i);
+        }
+    }
+    return positions;
 }
 
 };  // namespace lpn
