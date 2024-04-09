@@ -7,17 +7,6 @@
 namespace lpn
 {
 
-class QuadraticCongruences
-{
-   public:
-    static long_int Solve(const long_int & n, const long_int & p);
-
-   private:
-    static long_int SolveCongruence(const long_int & n, const long_int & h, const long_int & p);
-    static long_int FindStartValue(const long_int & n, const long_int & p);
-    static std::vector<bool> ToBinaryFormat(long_int val);
-};
-
 class Sieve
 {
    private:
@@ -70,7 +59,7 @@ class Sieve
     static long_int ComputeTargetFunction(const long_int & r, const long_int & n, size_t i);
 };
 
-class QuadraticSieve
+class QuadraticSieveFactorization
 {
    public:
     static FactorSet Factorize(const long_int & n);

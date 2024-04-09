@@ -1,8 +1,5 @@
 #include "qs.hpp"
-
-#include <climits>
-#include <cstdint>
-#include <random>
+#include "congruence.hpp"
 
 namespace lpn
 {
@@ -54,7 +51,7 @@ void Config::ComputeSmallPrimes(const long_int & n)
     }
 }
 
-FactorSet QuadraticSieve::Factorize(const long_int & n, const Sieve::Config & config)
+FactorSet QuadraticSieveFactorization::Factorize(const long_int & n, const Sieve::Config & config)
 {
     FactorSet factor;
     auto solution = Sieve::Solve(n, config);
@@ -63,11 +60,11 @@ FactorSet QuadraticSieve::Factorize(const long_int & n, const Sieve::Config & co
     return FindFactor(solution, matrix, n);
 }
 
-FactorSet QuadraticSieve::Factorize(const long_int & n) { return Factorize(n, Sieve::CreateConfig(n)); }
+FactorSet QuadraticSieveFactorization::Factorize(const long_int & n) { return Factorize(n, Sieve::CreateConfig(n)); }
 
-bool QuadraticSieve::IsPerfectSquare(const boost::dynamic_bitset<> & mask) { return mask.none(); }
+bool QuadraticSieveFactorization::IsPerfectSquare(const boost::dynamic_bitset<> & mask) { return mask.none(); }
 
-std::vector<size_t> QuadraticSieve::GetParticipantsPositions(const Line & line)
+std::vector<size_t> QuadraticSieveFactorization::GetParticipantsPositions(const Line & line)
 {
     std::vector<size_t> positions;
     for (size_t i = 0; i < line.participants.size(); ++i)
@@ -80,8 +77,8 @@ std::vector<size_t> QuadraticSieve::GetParticipantsPositions(const Line & line)
     return positions;
 }
 
-long_int QuadraticSieve::ComputeX(const Sieve::Solution & solution, const std::vector<size_t> & positions,
-                                  const long_int & n)
+long_int QuadraticSieveFactorization::ComputeX(const Sieve::Solution & solution, const std::vector<size_t> & positions,
+                                               const long_int & n)
 {
     long_int x = 1;
     for (auto pos : positions)
@@ -91,8 +88,8 @@ long_int QuadraticSieve::ComputeX(const Sieve::Solution & solution, const std::v
     return x;
 }
 
-long_int QuadraticSieve::ComputeY(const Sieve::Solution & solution, const std::vector<size_t> & positions,
-                                  const long_int & n)
+long_int QuadraticSieveFactorization::ComputeY(const Sieve::Solution & solution, const std::vector<size_t> & positions,
+                                               const long_int & n)
 {
     long_int y = 1;
     FactorSet factor;
@@ -108,7 +105,8 @@ long_int QuadraticSieve::ComputeY(const Sieve::Solution & solution, const std::v
     return y;
 }
 
-FactorSet QuadraticSieve::FindFactor(const Sieve::Solution & solution, const Matrix & matrix, const long_int & n)
+FactorSet QuadraticSieveFactorization::FindFactor(const Sieve::Solution & solution, const Matrix & matrix,
+                                                  const long_int & n)
 {
     FactorSet factor;
     for (const auto & line : matrix)
@@ -129,76 +127,6 @@ FactorSet QuadraticSieve::FindFactor(const Sieve::Solution & solution, const Mat
     }
     factor[n] = 1;
     return factor;
-}
-
-long_int QuadraticCongruences::Solve(const long_int & n, const long_int & p)
-{
-    assert(p % 2 != 0);
-
-    if (p % 4 == 3)
-    {
-        return FastExponentiationWithMod(n, (p + 1) / 4, p);
-    }
-    if (p % 8 == 5 && FastExponentiationWithMod(n, (p - 1) / 4, p) == 1)
-    {
-        return FastExponentiationWithMod(n, (p + 3) / 8, p);
-    }
-    if (p % 8 == 5 && FastExponentiationWithMod(n, (p - 1) / 4, p) == p - 1)
-    {
-        return (FastExponentiationWithMod(4 * n, (p + 3) / 8, p) * (p + 1) / 2) % p;
-    }
-    long_int h = FindStartValue(n, p);
-    return (SolveCongruence(n, h, p) * (p + 1) / 2) % p;
-}
-
-long_int QuadraticCongruences::FindStartValue(const long_int & n, const long_int & p)
-{
-    static std::mt19937 gen{42};
-    static std::uniform_int_distribution<size_t> distrib(1, UINT64_MAX);
-    long_int h = 1;
-    while (ComputeLegendreSymbol(h * h - 4 * n, p) != -1)
-    {
-        h = distrib(gen);
-    }
-    return h;
-}
-
-long_int QuadraticCongruences::SolveCongruence(const long_int & n, const long_int & h, const long_int & p)
-{
-    long_int m = n;
-    long_int v = h;
-    long_int w = (h * h - 2 * n) % p;
-    auto bitset = ToBinaryFormat((p + 1) / 2);
-
-    for (size_t i = 1; i < bitset.size(); ++i)
-    {
-        long_int x = (v * w - h * m) % p;
-        v = (v * v - 2 * m) % p;
-        w = (w * w - 2 * n * m) % p;
-        m = (m * m) % p;
-        if (bitset[i])
-        {
-            w = x;
-        }
-        else
-        {
-            v = x;
-            m = (n * m) % p;
-        }
-    }
-    return (p + v) % p;
-}
-
-std::vector<bool> QuadraticCongruences::ToBinaryFormat(long_int val)
-{
-    std::vector<bool> bitset;
-    while (val > 0)
-    {
-        bitset.push_back(val % 2 == 0);
-        val >>= 1;
-    }
-    std::reverse(bitset.begin(), bitset.end());
-    return bitset;
 }
 
 Sieve::Solution Sieve::Solve(const long_int & n, const Config & config)

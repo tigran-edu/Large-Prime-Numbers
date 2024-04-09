@@ -87,41 +87,6 @@ size_t ExtractPowerFast(long_int & a, const long_int & b)
     return power;
 }
 
-int ComputeLegendreSymbol(long_int n, long_int p)
-{
-    int legendre = 1;
-    n = n % p;
-
-    if (n == 0)
-    {
-        return 0;
-    }
-
-    if (n < 0)
-    {
-        n *= -1;
-        if (p % 4 == 3)
-        {
-            legendre *= -1;
-        }
-    }
-
-    while (n > 1)
-    {
-        size_t deg = ExtractPower(n, 2);
-        if (deg % 2 == 1 && (p * p - 1) % 16 == 8)
-        {
-            legendre *= -1;
-        }
-        if ((n - 1) * (p - 1) % 8 == 4)
-        {
-            legendre *= -1;
-        }
-        p = std::exchange<long_int, long_int>(n, p % n);
-    }
-    return legendre;
-}
-
 FactorSet FactorizeBasic(long_int a)
 {
     FactorSet factor;
@@ -137,7 +102,6 @@ FactorSet FactorizeBasic(long_int a)
         {
             factor[div] += counter;
         }
-        div += 2;
     }
     if (a > 1)
     {

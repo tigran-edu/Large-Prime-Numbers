@@ -66,8 +66,6 @@ bool IsStrongPseudoPrime(const long_int & p, const Container & primes)
     return false;
 }
 
-int ComputeLegendreSymbol(long_int n, long_int p);
-
 FactorSet FactorizeBasic(long_int a);
 
 bool IsPrimeBasic(const long_int & a);
