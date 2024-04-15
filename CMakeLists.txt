@@ -20,7 +20,7 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(cmake/glob_sources.cmake)
 include(cmake/sanitize.cmake)
 
-enable_testing()
+include(CTest)
 
 add_subdirectory(src)
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")

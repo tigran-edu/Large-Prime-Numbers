@@ -1,5 +1,6 @@
 #include "cfrac.hpp"
 #include "aliases.hpp"
+#include "base.hpp"
 #include "basic.hpp"
 #include "congruence.hpp"
 #include "gaussian.hpp"
@@ -31,13 +32,18 @@ Solution ContinuedFractions::Solve(const long_int & n, size_t factor_size)
     {
         state.Update();
         auto factor = TryToDecompose(solution.primes, state.c1);
-        if (factor.has_value())
-        {
-            solution.factors.push_back(std::move(factor.value()));
-            solution.values.push_back(state.p1);
-        }
+        AddFactor(factor, state, solution);
     }
     return solution;
+}
+
+void ContinuedFractions::AddFactor(const std::optional<FactorSet> & factor, const State & state, Solution & solution)
+{
+    if (factor.has_value())
+    {
+        solution.factors.push_back(std::move(factor.value()));
+        solution.values.push_back(state.p1);
+    }
 }
 
 FactorSet ContinuedFractionsFactorization::Factorize(const long_int & n) { return Factorize(n, kBasicFactorSize); }

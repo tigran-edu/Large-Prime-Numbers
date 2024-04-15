@@ -1,4 +1,4 @@
-#include "rho_factorization.hpp"
+#include "rho.hpp"
 
 #include <gtest/gtest.h>
 

@@ -30,6 +30,9 @@ class ContinuedFractions
 
    public:
     static Solution Solve(const long_int & n, size_t factor_size);
+
+   private:
+    static void AddFactor(const std::optional<FactorSet> & factor, const State & state, Solution & solution);
 };
 
 class ContinuedFractionsFactorization : private FactorizationBase

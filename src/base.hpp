@@ -6,8 +6,6 @@
 namespace lpn
 {
 
-namespace math = boost::multiprecision;
-
 struct Solution
 {
     FactorSets factors;

@@ -3,6 +3,8 @@
 namespace lpn
 {
 
+namespace math = boost::multiprecision;
+
 bool FactorizationBase::IsPerfectSquare(const Line & line) { return line.IsMaskEmpty(); }
 
 std::vector<size_t> FactorizationBase::GetParticipantsPositions(const Line & line)
