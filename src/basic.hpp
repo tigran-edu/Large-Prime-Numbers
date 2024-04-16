@@ -16,6 +16,8 @@ long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m);
 size_t ExtractPower(long_int & a, const long_int & b);
 size_t ExtractPowerFast(long_int & a, const long_int & b);
 
+std::vector<bool> ToBinaryFormat(long_int val);
+
 template <typename T>
 T gcd(T a, T b)  // NOLINT
 {

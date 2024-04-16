@@ -87,6 +87,18 @@ size_t ExtractPowerFast(long_int & a, const long_int & b)
     return power;
 }
 
+std::vector<bool> ToBinaryFormat(long_int val)
+{
+    std::vector<bool> bitset;
+    while (val > 0)
+    {
+        bitset.push_back(val % 2 == 1);
+        val >>= 1;
+    }
+    std::reverse(bitset.begin(), bitset.end());
+    return bitset;
+}
+
 FactorSet FactorizeBasic(long_int a)
 {
     FactorSet factor;

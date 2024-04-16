@@ -68,6 +68,20 @@ TEST(Basic, ExtractPowerFast)
     }
 }
 
+TEST(Basic, Binary)
+{
+    size_t test_size = 20;
+    std::vector<bool> bitset(test_size, true);
+    long_int val = (1 << test_size) - 1;
+    ASSERT_EQ(bitset, ToBinaryFormat(val));
+    val += 1;
+    ASSERT_TRUE(ToBinaryFormat(val)[0]);
+    for (size_t i = 1; i < test_size; ++i)
+    {
+        ASSERT_FALSE(ToBinaryFormat(val)[1]);
+    }
+}
+
 TEST(Basic, IsPrime)
 {
     ASSERT_TRUE(IsPrimeBasic(2));

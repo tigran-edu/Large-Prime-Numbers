@@ -86,7 +86,7 @@ long_int QuadraticCongruences::SolveCongruence(const long_int & n, const long_in
         v = (v * v - 2 * m) % p;
         w = (w * w - 2 * n * m) % p;
         m = (m * m) % p;
-        if (bitset[i])
+        if (!bitset[i])
         {
             w = x;
         }
@@ -97,18 +97,6 @@ long_int QuadraticCongruences::SolveCongruence(const long_int & n, const long_in
         }
     }
     return (p + v) % p;
-}
-
-std::vector<bool> QuadraticCongruences::ToBinaryFormat(long_int val)
-{
-    std::vector<bool> bitset;
-    while (val > 0)
-    {
-        bitset.push_back(val % 2 == 0);
-        val >>= 1;
-    }
-    std::reverse(bitset.begin(), bitset.end());
-    return bitset;
 }
 
 bool IsQuadraticResidue(const long_int & n, const long_int & p) { return ComputeLegendreSymbol(n, p) == 1; }
