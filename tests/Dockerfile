@@ -34,6 +34,6 @@ WORKDIR /project
 COPY ../ ./
 
 CMD cmake . && \
-    cmake --build ./ --config Release && \
+    cmake --build ./ --config RelWithDebInfo && \
     make && \
     CTEST_OUTPUT_ON_FAILURE=TRUE ctest tests --verbose

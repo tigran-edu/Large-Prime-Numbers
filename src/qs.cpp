@@ -79,8 +79,7 @@ Solution Sieve::Solve(const long_int & n, const Config & config)
     }
     for (size_t i = 0; i < logs.size(); ++i)
     {
-        if (config.closeness_ <= logs[i] && logs[i] <= config.target_ &&
-            solution.values.size() < 1.1 * config.factor_size_)
+        if (config.closeness_ <= logs[i] && solution.values.size() < 1.1 * config.factor_size_)
         {
             auto factor = TryToDecompose(config.primes_, ComputeTargetFunction(r, n, i));
             if (factor.has_value())
@@ -90,6 +89,7 @@ Solution Sieve::Solve(const long_int & n, const Config & config)
             }
         }
     }
+    std::cout << solution.values.size() << " " << config.factor_size_ << std::endl;
 
     solution.primes = std::move(config.primes_);
     return solution;

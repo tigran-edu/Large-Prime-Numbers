@@ -17,13 +17,13 @@ class EllipticCurveFactorization
     static long_int ComputeB(const long_int & x, const long_int & y, const long_int & a, const long_int & n);
 
    private:
-    long_int X_SUB_2I(const long_int & r, const long_int & s, const long_int & n) const;
-    long_int Z_SUB_2I(const long_int & r, const long_int & s, const long_int & n) const;
-    long_int X_SUB_2I_PLUS_ONE(const long_int & r, const long_int & s, const long_int & u, const long_int & v,
-                               const long_int & n) const;
-    long_int Z_SUB_2I_PLUS_ONE(const long_int & r, const long_int & s, const long_int & u, const long_int & v,
-                               const long_int & n) const;
-    void Foo(size_t k, const long_int & n);
+    long_int ComputeX(const long_int & r, const long_int & s, const long_int & n) const;
+    long_int ComputeZ(const long_int & r, const long_int & s, const long_int & n) const;
+    long_int ComputeU(const long_int & r, const long_int & s, const long_int & u, const long_int & v,
+                      const long_int & n) const;
+    long_int ComputeW(const long_int & r, const long_int & s, const long_int & u, const long_int & v,
+                      const long_int & n) const;
+    void ComputeNextValues(size_t k, const long_int & n);
     FactorSet FindFactor(const long_int & n, size_t max_iter);
 
    private:
