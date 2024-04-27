@@ -1,6 +1,8 @@
 #include "qs.hpp"
+#include "base.hpp"
 #include "congruence.hpp"
 #include "gaussian.hpp"
+#include "thread_group.hpp"
 
 namespace lpn
 {
@@ -52,51 +54,110 @@ void Config::ComputeSmallPrimes(const long_int & n)
     }
 }
 
-FactorSet QuadraticSieveFactorization::Factorize(const long_int & n, const Sieve::Config & config)
+FactorSet QuadraticSieveFactorization::Factorize(const long_int & n, const Sieve::Config & config, bool multi_thread)
 {
     FactorSet factor;
-    auto solution = Sieve::Solve(n, config);
+    Solution solution;
+    if (multi_thread)
+    {
+        solution = Sieve::SolveMultiThread(n, config);
+    }
+    else
+    {
+        solution = Sieve::Solve(n, config);
+    }
     GaussianBasic gs = GaussianBasic(solution.factors, solution.primes);
     auto matrix = gs.Solve();
     return FindFactor(solution, matrix, n);
 }
 
-FactorSet QuadraticSieveFactorization::Factorize(const long_int & n) { return Factorize(n, Sieve::CreateConfig(n)); }
+FactorSet QuadraticSieveFactorization::Factorize(const long_int & n, bool multi_thread)
+{
+    return Factorize(n, Sieve::CreateConfig(n), multi_thread);
+}
+
+Sieve::Sieve(const Config & config, const long_int & n)
+    : r_(math::sqrt(n) - config.segment_size_), sieve_(2 * config.segment_size_, 0.0)
+{
+}
 
 Solution Sieve::Solve(const long_int & n, const Config & config)
 {
-    Solution solution;
-    std::vector<float> logs(2 * config.segment_size_, 0.0);
-    const long_int r = math::sqrt(n) - config.segment_size_;
-
-    for (size_t pos = 0; pos < config.primes_.size(); ++pos)
-    {
-        size_t p = config.primes_[pos];
-        // n = x^2 mod p; f(r) = r^2 - n; target f(r) == 0 mod p
-        size_t i = (size_t)((config.congruences_[pos] + p - (r % p)) % p);
-        size_t j = (size_t)((2 * p - config.congruences_[pos] - (r % p)) % p);
-        AddLogAtSpecificPositions(i, j, p, logs);
-    }
-    for (size_t i = 0; i < logs.size(); ++i)
-    {
-        if (config.closeness_ <= logs[i] && solution.values.size() < 1.1 * config.factor_size_)
-        {
-            auto factor = TryToDecompose(config.primes_, ComputeTargetFunction(r, n, i));
-            if (factor.has_value())
-            {
-                solution.values.push_back(i + r);
-                solution.factors.push_back(std::move(factor.value()));
-            }
-        }
-    }
-    std::cout << solution.values.size() << " " << config.factor_size_ << std::endl;
-
-    solution.primes = std::move(config.primes_);
+    Sieve sieve(config, n);
+    sieve.ComputeSieve(config, 0, sieve.sieve_.size());
+    Solution solution = sieve.FindAllFactorizable(config, n);
+    solution.primes = config.primes_;
     return solution;
 }
 
-void Sieve::AddLogAtSpecificPositions(size_t i, size_t j, size_t p, std::vector<float> & logs)
+Solution Sieve::SolveMultiThread(const long_int & n, const Config & config)
 {
+    Sieve sieve(config, n);
+    sieve.ComputeSieveMultiThread(config, n);
+    Solution solution = sieve.FindAllFactorizable(config, n);
+    solution.primes = config.primes_;
+    return solution;
+}
+
+void Sieve::ComputeSieve(const Config & config, size_t left_border, size_t right_border)
+{
+    for (size_t pos = 0; pos < config.primes_.size(); pos++)
+    {
+        size_t p = config.primes_[pos];
+        // n = x^2 mod p; f(r) = r^2 - n; target f(r) == 0 mod p
+        size_t i = (size_t)((config.congruences_[pos] + p - (r_ % p)) % p);
+        size_t j = (size_t)((2 * p - config.congruences_[pos] - (r_ % p)) % p);
+        AddPrimeInSieve(i, j, p, left_border, right_border);
+    }
+}
+
+void Sieve::ComputeSieveMultiThread(const Config & config, const long_int & n)
+{
+    int threads = ThreadGroup::GetThreadAmount();
+    auto group = ThreadGroup();
+    for (size_t pos = 0; pos < threads; ++pos)
+    {
+        group.AddTask(
+            [pos, config, this, threads]() mutable
+            { this->ComputeSieve(config, ComputeLeftBorder(threads, pos), ComputeRightBorder(threads, pos)); });
+    }
+    group.ComputeAllTasks();
+}
+
+Solution Sieve::FindAllFactorizable(const Config & config, const long_int & n)
+{
+    Solution solution;
+    for (size_t i = 0; i < sieve_.size(); ++i)
+    {
+        if (config.closeness_ <= sieve_[i] && solution.values.size() < 1.1 * config.factor_size_)
+        {
+            auto factor = TryToDecompose(config.primes_, ComputeTargetFunction(r_, n, i));
+            AddFactor(factor, i, solution);
+        }
+    }
+    return solution;
+}
+
+void Sieve::AddFactor(const std::optional<FactorSet> & factor, size_t i, Solution & solution) const
+{
+    if (factor)
+    {
+        solution.values.push_back(i + r_);
+        solution.factors.push_back(std::move(factor.value()));
+    }
+}
+
+void Sieve::AddPrimeInSieve(size_t i, size_t j, size_t p, size_t left_border, size_t right_border)
+{
+    if (i < left_border)
+    {
+        i += ((left_border - i + p - 1) / p) * p;
+    }
+    if (j < left_border)
+    {
+        j += ((left_border - j + p - 1) / p) * p;
+    }
+
     if (j < i)
     {
         std::swap(i, j);
@@ -106,31 +167,45 @@ void Sieve::AddLogAtSpecificPositions(size_t i, size_t j, size_t p, std::vector<
 
     if (i == j)
     {
-        while (i < logs.size())
+        while (i < right_border)
         {
-            logs[i] += p_log;
+            sieve_[i] += p_log;
             i += p;
         }
         return;
     }
 
-    while (j < logs.size())
+    while (j < right_border)
     {
-        logs[i] += p_log;
-        logs[j] += p_log;
+        sieve_[i] += p_log;
+        sieve_[j] += p_log;
         i += p;
         j += p;
     }
 
-    if (i < logs.size())
+    if (i < right_border)
     {
-        logs[i] += p_log;
+        sieve_[i] += p_log;
     }
 }
 
 long_int Sieve::ComputeTargetFunction(const long_int & r, const long_int & n, size_t i)
 {
     return math::abs((r + i) * (r + i) - n);
+}
+
+size_t Sieve::ComputeLeftBorder(size_t threads, size_t position) const
+{
+    return ((sieve_.size()) / threads) * position;
+}
+
+size_t Sieve::ComputeRightBorder(size_t threads, size_t position) const
+{
+    if (position + 1 == threads)
+    {
+        return sieve_.size();
+    }
+    return ((sieve_.size()) / threads) * (position + 1);
 }
 
 };  // namespace lpn

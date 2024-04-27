@@ -2,6 +2,8 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include "basic.hpp"
+#include <set>
+#include <unordered_set>
 
 namespace lpn
 {
@@ -23,15 +25,16 @@ class GaussianBasic
 
     using Matrix = std::vector<Line>;
 
-    static Matrix CreateMatrix(const FactorSets & factors, const std::vector<size_t> & primes);
-
     GaussianBasic(const FactorSets & factors, const std::vector<size_t> & primes);
 
     Matrix Solve();
 
+   private:
+    static Matrix CreateMatrix(const FactorSets & factors, const std::vector<size_t> & primes);
+
     size_t FindFirstNonZeroInLine(size_t line_pos) const;
 
-    void Add(size_t col, size_t line);
+    void AddToAll(size_t col, size_t line);
 
    private:
     size_t m_;

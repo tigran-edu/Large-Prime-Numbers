@@ -1,4 +1,5 @@
 #include "gaussian.hpp"
+#include <algorithm>
 
 namespace lpn
 {
@@ -30,9 +31,9 @@ GaussianBasic::Matrix GaussianBasic::CreateMatrix(const FactorSets & factors, co
         for (size_t j = 0; j < m; ++j)
         {
             auto iter = factors[i].find(primes[j]);
-            if (iter != factors[i].end())
+            if (iter != factors[i].end() && iter->second % 2 == 1)
             {
-                matrix[i].mask[j] = bool(iter->second % 2);
+                matrix[i].mask[j] = true;
             }
         }
         matrix[i].participants[i] = true;
@@ -42,14 +43,12 @@ GaussianBasic::Matrix GaussianBasic::CreateMatrix(const FactorSets & factors, co
 
 size_t GaussianBasic::FindFirstNonZeroInLine(size_t line_pos) const
 {
-    for (size_t col = 0; col < m_; ++col)
+    size_t col = matrix_[line_pos].mask.find_first();
+    if (col == std::string::npos)
     {
-        if (matrix_[line_pos].mask[col])
-        {
-            return col;
-        }
+        return m_;
     }
-    return m_;
+    return col;
 }
 
 GaussianBasic::Matrix GaussianBasic::Solve()
@@ -59,17 +58,17 @@ GaussianBasic::Matrix GaussianBasic::Solve()
         size_t col = FindFirstNonZeroInLine(i);
         if (col != m_)
         {
-            Add(col, i);
+            AddToAll(col, i);
         }
     }
     return matrix_;
 }
 
-void GaussianBasic::Add(size_t col, size_t line)
+void GaussianBasic::AddToAll(size_t col, size_t line)
 {
     for (size_t i = 0; i < n_; ++i)
     {
-        if (line != i && matrix_[i].mask[col])
+        if (matrix_[i].mask[col] && i != line)
         {
             matrix_[i] ^= matrix_[line];
         }

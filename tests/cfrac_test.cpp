@@ -7,7 +7,7 @@ namespace
 
 using namespace lpn;  // NOLINT
 
-TEST(Sieve, QuadraticSieve)
+TEST(CFRAC, ContinuedFractions)
 {
     long_int n("59469489332848408438249254427481121839977");  // 338555568168236555657 * 175656509371887105761
     FactorSet factor = ContinuedFractionsFactorization::Factorize(n);
@@ -15,7 +15,7 @@ TEST(Sieve, QuadraticSieve)
     ASSERT_EQ(Eval(factor), n);
 }
 
-TEST(Sieve, QuadraticSieveWithConfig)
+TEST(CFRAC, ContinuedFractionsWithConfig)
 {
     long_int n("4482406424966880742829846540605971439398287609");  // 86738535685150523290199 * 51677220390685710220591
     FactorSet factor = ContinuedFractionsFactorization::Factorize(n, 1000);
