@@ -3,6 +3,17 @@
 namespace lpn
 {
 
+FactorSet RhoFactorization::Factorize(const long_int & n, size_t starting_point)
+{
+    return RhoFactorization().FindFactor(n, starting_point);
+}
+
+FactorSet RhoFactorization::Factorize(const long_int & n, const long_int & c, size_t max_iter, size_t frequency,
+                                      size_t max_attemp, size_t starting_point)
+{
+    return RhoFactorization(c, max_iter, frequency, max_attemp).FindFactor(n, starting_point);
+}
+
 RhoFactorization::RhoFactorization()
     : c_(BasicConfig::kDefCValue),
       max_iter_(BasicConfig::kDefMaxIterValue),
@@ -16,12 +27,12 @@ RhoFactorization::RhoFactorization(const long_int & c, size_t max_iter, size_t f
 {
 }
 
-FactorSet RhoFactorization::Factorize(const long_int & n, size_t starting_point)
+FactorSet RhoFactorization::FindFactor(const long_int & n, size_t starting_point)
 {
     FactorSet factor;
     long_int x1 = starting_point;
 
-    for (size_t i = 0; i < max_attemp_ && n > 1; ++i)
+    for (size_t i = 0; i < max_attemp_; ++i)
     {
         long_int divisor = FindDivisor(n, x1);
         if (divisor != 1 && divisor != n)

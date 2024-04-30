@@ -15,10 +15,10 @@ Config Sieve::CreateConfig(const long_int & n, size_t segment_size, size_t facto
 {
     Config config(segment_size, factor_size);
     config.Reserve();
-    config.ComputeSmallPrimes(n);
+    config.ComputePrimes(n);
     config.ComputeTarget(n);
     config.ComputeCloseness(expansion_rate);
-    return config;  // Дима, эта функция была написана ради тебя ❤❤❤
+    return config;
 }
 
 Config Sieve::CreateConfig(const long_int & n)
@@ -39,7 +39,7 @@ void Config::Reserve()
 
 void Config::ComputeTarget(const long_int & n) { target_ = log10(double(n)) / 2 + log10(double(segment_size_)); }
 
-void Config::ComputeSmallPrimes(const long_int & n)
+void Config::ComputePrimes(const long_int & n)
 {
     primes_.push_back(2);
     congruences_.push_back(n % 2);

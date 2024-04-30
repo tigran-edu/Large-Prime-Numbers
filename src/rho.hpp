@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aliases.hpp"
 #include "basic.hpp"
 #include <optional>
 
@@ -19,11 +20,16 @@ class RhoFactorization
     };
 
    public:
-    RhoFactorization();
-    RhoFactorization(const long_int & c, size_t max_iter, size_t frequency, size_t max_attemp);
-    FactorSet Factorize(const long_int & n, size_t starting_point);
+    static FactorSet Factorize(const long_int & n, size_t starting_point);
+    static FactorSet Factorize(const long_int & n, const long_int & c, size_t max_iter, size_t frequency,
+                               size_t max_attemp, size_t starting_point);
 
    private:
+    RhoFactorization();
+    RhoFactorization(const long_int & c, size_t max_iter, size_t frequency, size_t max_attemp);
+
+   private:
+    FactorSet FindFactor(const long_int & n, size_t starting_point);
     size_t ComputeNextRange(size_t range) const;
     void UpdateX1(const long_int & x2, long_int & x1);
     void UpdateX2(const long_int & n, size_t range, long_int & x2);

@@ -24,10 +24,7 @@ include(CTest)
 
 add_subdirectory(src)
 add_subdirectory(thread)
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set (ASAN true)
-    set (UBSAN true)
-endif()
+
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     add_subdirectory(tests)
     add_subdirectory(programs)

@@ -33,7 +33,7 @@ class Sieve
 
         void ComputeTarget(const long_int & n);
 
-        void ComputeSmallPrimes(const long_int & n);
+        void ComputePrimes(const long_int & n);
 
         size_t segment_size_;
         size_t factor_size_;

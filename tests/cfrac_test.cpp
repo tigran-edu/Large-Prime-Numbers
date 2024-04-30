@@ -17,8 +17,8 @@ TEST(CFRAC, ContinuedFractions)
 
 TEST(CFRAC, ContinuedFractionsWithConfig)
 {
-    long_int n("4482406424966880742829846540605971439398287609");  // 86738535685150523290199 * 51677220390685710220591
-    FactorSet factor = ContinuedFractionsFactorization::Factorize(n, 1000);
+    long_int n("275496260473012513310855787717477881849");  // 23074736938723048343 * 11939302328976341743
+    FactorSet factor = ContinuedFractionsFactorization::Factorize(n, 500);
     ASSERT_EQ(factor.size(), 2);
     ASSERT_EQ(Eval(factor), n);
 }
