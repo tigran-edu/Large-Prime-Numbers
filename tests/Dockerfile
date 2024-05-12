@@ -21,8 +21,8 @@ RUN apt-get update && \
     mv lib/*.a /usr/lib
 
 RUN cd /tmp && \
-    BOOST_VERSION_MOD=$(echo $BOOST_VERSION | tr . _) && \
-    wget https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_MOD}.tar.bz2 && \
+    BOOST_VERSION_MOD=$(echo 1.84.0 | tr . _) && \
+    wget https://boostorg.jfrog.io/artifactory/main/release/1.84.0/source/boost_${BOOST_VERSION_MOD}.tar.bz2 && \
     tar --bzip2 -xf boost_${BOOST_VERSION_MOD}.tar.bz2 && \
     cd boost_${BOOST_VERSION_MOD} && \
     ./bootstrap.sh --prefix=/usr/local && \
