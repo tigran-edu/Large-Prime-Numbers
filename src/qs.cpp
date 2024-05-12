@@ -9,11 +9,15 @@ namespace lpn
 namespace math = boost::multiprecision;
 using Config = Sieve::Config;
 
-Config::Config(size_t segment_size, size_t factor_size) : segment_size_(segment_size), factor_size_(factor_size) {}
-
-Config Sieve::CreateConfig(const long_int & n, size_t segment_size, size_t factor_size, float expansion_rate)
+Config::Config(size_t segment_size, size_t factor_size, bool multi_thread)
+    : segment_size_(segment_size), factor_size_(factor_size), multi_thread_(multi_thread)
 {
-    Config config(segment_size, factor_size);
+}
+
+Config Sieve::CreateConfig(const long_int & n, size_t segment_size, size_t factor_size, float expansion_rate,
+                           bool multi_thread)
+{
+    Config config(segment_size, factor_size, multi_thread);
     config.Reserve();
     config.ComputePrimes(n);
     config.ComputeTarget(n);
@@ -54,46 +58,32 @@ void Config::ComputePrimes(const long_int & n)
     }
 }
 
-FactorSet QuadraticSieveFactorization::Factorize(const long_int & n, const Sieve::Config & config, bool multi_thread)
+FactorSet QuadraticSieveFactorization::Factorize(const long_int & n, const Sieve::Config & config)
 {
-    FactorSet factor;
-    Solution solution;
-    if (multi_thread)
-    {
-        solution = Sieve::SolveMultiThread(n, config);
-    }
-    else
-    {
-        solution = Sieve::Solve(n, config);
-    }
+    Solution solution = Sieve::Solve(n, config);
     GaussianBasic gs = GaussianBasic(solution.factors, solution.primes);
-    auto matrix = gs.Solve();
+    Matrix matrix = gs.Solve();
     return FindFactor(solution, matrix, n);
 }
 
-FactorSet QuadraticSieveFactorization::Factorize(const long_int & n, bool multi_thread)
-{
-    return Factorize(n, Sieve::CreateConfig(n), multi_thread);
-}
+FactorSet QuadraticSieveFactorization::Factorize(const long_int & n) { return Factorize(n, Sieve::CreateConfig(n)); }
 
-Sieve::Sieve(const Config & config, const long_int & n)
+Sieve::Sieve(const long_int & n, const Config & config)
     : r_(math::sqrt(n) - config.segment_size_), sieve_(2 * config.segment_size_, 0.0)
 {
 }
 
 Solution Sieve::Solve(const long_int & n, const Config & config)
 {
-    Sieve sieve(config, n);
-    sieve.ComputeSieve(config, 0, sieve.sieve_.size());
-    Solution solution = sieve.FindAllFactorizable(config, n);
-    solution.primes = config.primes_;
-    return solution;
-}
-
-Solution Sieve::SolveMultiThread(const long_int & n, const Config & config)
-{
-    Sieve sieve(config, n);
-    sieve.ComputeSieveMultiThread(config, n);
+    Sieve sieve(n, config);
+    if (config.multi_thread_)
+    {
+        sieve.ComputeSieveMultiThread(config, n);
+    }
+    else
+    {
+        sieve.ComputeSieve(config, 0, sieve.sieve_.size());
+    }
     Solution solution = sieve.FindAllFactorizable(config, n);
     solution.primes = config.primes_;
     return solution;
@@ -131,7 +121,7 @@ Solution Sieve::FindAllFactorizable(const Config & config, const long_int & n)
     {
         if (config.closeness_ <= sieve_[i] && solution.values.size() < 1.1 * config.factor_size_)
         {
-            auto factor = TryToDecompose(config.primes_, ComputeTargetFunction(r_, n, i));
+            auto factor = TryToDecompose(config.primes_, ComputeTargetFunction(n, i));
             AddFactor(factor, i, solution);
         }
     }
@@ -189,10 +179,7 @@ void Sieve::AddPrimeInSieve(size_t i, size_t j, size_t p, size_t left_border, si
     }
 }
 
-long_int Sieve::ComputeTargetFunction(const long_int & r, const long_int & n, size_t i)
-{
-    return math::abs((r + i) * (r + i) - n);
-}
+long_int Sieve::ComputeTargetFunction(const long_int & n, size_t i) const { return math::abs((r_ + i) * (r_ + i) - n); }
 
 size_t Sieve::ComputeLeftBorder(size_t threads, size_t position) const
 {
