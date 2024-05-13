@@ -27,5 +27,4 @@ add_subdirectory(thread)
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     add_subdirectory(tests)
-    add_subdirectory(programs)
 endif()

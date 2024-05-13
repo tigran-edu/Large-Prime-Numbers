@@ -24,7 +24,7 @@ long_int Eval(const FactorSet & factor)
 
 long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m)
 {
-    assert(b > 0);
+    assert(b >= 0);
 
     long_int n = 1;
     while (b != 0)
@@ -41,7 +41,7 @@ long_int FastExponentiationWithMod(long_int a, long_int b, const long_int & m)
 
 long_int FastExponentiation(long_int a, long_int b)
 {
-    assert(b > 0);
+    assert(b >= 0);
 
     long_int n = 1;
     while (b != 0)
