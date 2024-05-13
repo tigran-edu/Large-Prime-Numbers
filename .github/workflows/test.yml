@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: docker build
+        run: docker build --tag=tests -f tests/Dockerfile .
+      - name: run docker
+        run: docker run -t --rm tests
