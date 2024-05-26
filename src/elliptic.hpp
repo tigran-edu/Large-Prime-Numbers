@@ -8,7 +8,6 @@ namespace lpn
 class EllipticCurveFactorization
 {
    public:
-    static FactorSet Factorize(const long_int & n);
     static FactorSet Factorize(const long_int & n, const long_int & a, const long_int & x, const long_int & y,
                                size_t max_iter);
 
