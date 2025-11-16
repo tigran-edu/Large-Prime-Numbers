@@ -1,32 +1,31 @@
-Курсовой проект Large Prime Numbers
+Large Prime Numbers
 ======
-Курсовой проект выполнен студентом Андряном Тиграном, ВШЭ ФКН ПМИ БПМИ215.
+The course project was completed by student Andrian Tigran, HSE Faculty of Computer Science, Applied Mathematics and Information Science.
 -----
-Данный раздел является инструкцией по использованию библиотеки LPN.
-## Сборка
-Сборка библиотеки происходит при помощи утилиты [Cmake](https://cmake.org) версии 3.22 и выше. Для использования библиотеки также понадобится предустановленная библиотека [Boost](https://www.boost.org/) версии 1.84.0.
-## Основные понятия
-Все основные aliases находятся в файле [aliases.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/aliases.hpp).
-* **FactorSet** - набор делителей числа со степенями
-* **FactorSets** - набор из FactorSet
-* **long_int** - тип целых чисел с бесконечным количеством знаков
+## Build
+The library is built using the [Cmake](https://cmake.org) version 3.22 or higher. To use the LPN, the pre-installed library [Boost](https://www.boost.org/) version 1.84.0 or higher is also needed.
+## Basic Concepts
+All the main aliases are located in the file [aliases.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/aliases.hpp).
+* **FactorSet** - set of divisors of a number with powers
+* **FactorSets** - set consisting of FactorSet
+* **long_int** - type with an infinite number of digits
 
-# Алгоритмы факторизации
+# Factorization algorithms
 
 ## Trial Division
-Базовые алгоритмы находятся в файле [basic.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/basic.hpp#L86C11-L86C25). Функция FactorizeBasic из `basic.hpp` предоставляет базовый алгоритм факторизации.
+The basic algo located in the [basic.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/basic.hpp#L86C11-L86C25). The function FactorizeBasic from `basic.hpp` provides a basic factorization algorithm.
 ```c++
 FactorSet FactorizeBasic(long_int a);
 ```
 
 ## Pollard Rho 
-Данный алгоритм располагается в файле [rho.npp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/rho.hpp#L10C1-L11C1). Класс `RhoFactorization` предоставляет 2 публичных статических метода:
+The method is located in the file [rho.npp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/rho.hpp#L10C1-L11C1). The class `RhoFactorization` provides 2 static public methods:
 ```c++
 static FactorSet Factorize(const long_int & n, size_t starting_point);
 static FactorSet Factorize(const long_int & n, const long_int & c, size_t max_iter, size_t frequency,
                              size_t max_attemp, size_t starting_point);
 ```
-Первая функция подразумевает использование базовой конфигурации алгоритма:
+The first one uses basic configuration:
 ```c++
 struct BasicConfig
 {
@@ -37,16 +36,17 @@ struct BasicConfig
     kDefMaxAttempValue = 100;
 };
 ```
-Если пользователь желает более точной настройки, то для этого предоставлен 2 публичный метод, который позволяет полностью настроить алгоритм под определенное вводимое число n.
+
+If the user requires more precise tuning, there is the second public method available that allow the algorithm to be fully customized for a specific input number n.
 
 
 ## Quadratic Sieve
-Алгоритм представлен в файле [qs.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/qs.hpp#L70C7-L70C34). Класс `QuadraticSieveFactorization` предоставляет 2 публичных статических метода:
+The method is located in the file [qs.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/qs.hpp#L70C7-L70C34). The class `QuadraticSieveFactorization` provides 2 static public methods:
 ```c++
 static FactorSet Factorize(const long_int & n);
 static FactorSet Factorize(const long_int & n, const Sieve::Config & config);
 ```
-Первый метод подразумевает использование базового конфига решета:
+The first one uses basic configuration of the Sieve:
 ```c++
 struct BasicConfig
 {
@@ -55,44 +55,44 @@ struct BasicConfig
     kExpansionRate = 1.5;
 };
 ```
-Если же пользователь хочет более тонкой настройки, то для этого предоставлен 2 публичный метод, который принимает конфиг.
+If the user requires more precise tuning, there is the second public method available that allow the algorithm to be fully customized by a config.
 ### Config
-* `segment_size` - размер сегмента решета, сегмент - половина решета
-* `factor_size` - размер множетсва простых чисел, используемых в алгоритме
-* `multi_thread` - булевая переменная, при значении True использует многопоточное решение решета
-* `expansion_rate` - коэффициент, устанавливающий минимальную границу значения в решете
+* `segment_size` - the size of sieve segment, segment - half of the sieve size
+* `factor_size` -  the size of the set of prime numbers used in the algorithm
+* `multi_thread` - enable parallel
+* `expansion_rate` - the coefficient that sets the minimum limit of the value in the sieve
   
-Конфиг создается через статических метод в классе `Sieve`:
+The config is created through a static method in the class `Sieve`:
 ```c++
   static Config CreateConfig(const long_int & n, size_t segment_size, size_t factor_size, float expansion_rate,
                              bool multi_thread = false);
 ```
 
 ## Continued Fraction
-Алгоритм расположен в файле [cfrac.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/cfrac.hpp#L38). Класс `ContinuedFractionsFactorization` предоставляет 2 публичных статических метода:
+The method is located in the file [cfrac.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/cfrac.hpp#L38). The class `ContinuedFractionsFactorization` provides 2 static public methods:
 ```c++
 static FactorSet Factorize(const long_int & n);
 static FactorSet Factorize(const long_int & n, size_t factor_size);
 ```
-Первый метод использует базовый размер множества простых чисел - 4000.
+The first one uses default factor_size = 4000
 
 ## Elliptic Curve
-Алгоритм расположен в файле [elliptic.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/elliptic.hpp#L8). Класс `EllipticCurveFactorization` предоставляет публичный статический метод:
+The method is located in the file [elliptic.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/elliptic.hpp#L8). The class `EllipticCurveFactorization` provides static public method:
 ```c++
 static FactorSet Factorize(const long_int & n, const long_int & a, const long_int & x, const long_int & y,
                            size_t max_iter);
 ```
-### Параметры
-* `a` - параметр эллиптической кривой
-*  `x` и `y` - координата на кривой
-*  `max_iter` - максимальное количество итераций алгоритма
+### Parameters
+* `a` - elliptic curve parameter
+*  `x` и `y` - coordinate on the curve
+*  `max_iter` - maximum number of iterations
 
-# Проверка чисел на простоту
-Библиотека LPN предоставляет 2 метода проверки чисел на простоту:
+# Checking numbers for primality
+The library LPN provides 2 methods for the checking numbers for primality:
 - PseudoPrimeTest
 - StrongPseudoPrimeTest
   
-Оба алгоритма находятся в файле [basic.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/basic.hpp).
+Methods are located in the file [basic.hpp](https://github.com/tigran-edu/Large-Prime-Numbers/blob/main/src/basic.hpp).
 ```c++
 template <typename Container>
 bool IsPseudoPrime(const long_int & p, const Container & primes);
